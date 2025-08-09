@@ -1,0 +1,60 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="filmGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cameraGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2C3E50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#34495E;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="3" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="url(#cameraGradient)" filter="url(#shadow)"/>
+  
+  <!-- Film Strip -->
+  <rect x="30" y="80" width="140" height="40" fill="url(#filmGradient)" rx="5"/>
+  
+  <!-- Film holes -->
+  <circle cx="45" cy="90" r="3" fill="#2C3E50"/>
+  <circle cx="60" cy="90" r="3" fill="#2C3E50"/>
+  <circle cx="75" cy="90" r="3" fill="#2C3E50"/>
+  <circle cx="90" cy="90" r="3" fill="#2C3E50"/>
+  <circle cx="105" cy="90" r="3" fill="#2C3E50"/>
+  <circle cx="120" cy="90" r="3" fill="#2C3E50"/>
+  <circle cx="135" cy="90" r="3" fill="#2C3E50"/>
+  <circle cx="150" cy="90" r="3" fill="#2C3E50"/>
+  <circle cx="155" cy="90" r="3" fill="#2C3E50"/>
+  
+  <circle cx="45" cy="110" r="3" fill="#2C3E50"/>
+  <circle cx="60" cy="110" r="3" fill="#2C3E50"/>
+  <circle cx="75" cy="110" r="3" fill="#2C3E50"/>
+  <circle cx="90" cy="110" r="3" fill="#2C3E50"/>
+  <circle cx="105" cy="110" r="3" fill="#2C3E50"/>
+  <circle cx="120" cy="110" r="3" fill="#2C3E50"/>
+  <circle cx="135" cy="110" r="3" fill="#2C3E50"/>
+  <circle cx="150" cy="110" r="3" fill="#2C3E50"/>
+  <circle cx="155" cy="110" r="3" fill="#2C3E50"/>
+  
+  <!-- Camera Lens -->
+  <circle cx="100" cy="70" r="25" fill="#1A252F" stroke="url(#filmGradient)" stroke-width="3"/>
+  <circle cx="100" cy="70" r="18" fill="#2C3E50"/>
+  <circle cx="100" cy="70" r="12" fill="#34495E"/>
+  <circle cx="105" cy="65" r="3" fill="#FFD700" opacity="0.8"/>
+  
+  <!-- Play Button -->
+  <polygon points="85,135 85,155 105,145" fill="url(#filmGradient)" filter="url(#shadow)"/>
+  
+  <!-- Stars decoration -->
+  <polygon points="50,40 52,46 58,46 53,50 55,56 50,52 45,56 47,50 42,46 48,46" fill="#FFD700" opacity="0.8"/>
+  <polygon points="150,160 152,166 158,166 153,170 155,176 150,172 145,176 147,170 142,166 148,166" fill="#FFD700" opacity="0.8"/>
+  <polygon points="165,50 166,54 170,54 167,57 168,61 165,59 162,61 163,57 160,54 164,54" fill="#FFD700" opacity="0.6"/>
+  
+  <!-- Text MovieSite -->
+  <text x="100" y="185" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="16" font-weight="bold" fill="url(#filmGradient)">MovieSite</text>
+</svg>
