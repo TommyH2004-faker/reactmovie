@@ -8,19 +8,83 @@ interface KetQuaInterface {
     tongSoPhim: number;
 }
 
+// async function layDanhSachPhim(duongDan: string): Promise<KetQuaInterface> {
+//     const ketQua: Movie[] = [];
+//
+//     const response = await my_request(duongDan);
+//
+//     // NestJS trả về array trực tiếp, không có _embedded
+//     const responseData = Array.isArray(response) ? response : response.data;
+//
+//     // Giả lập pagination (có thể thêm vào NestJS sau)
+//     const tongSoTrang =  ;
+//     const tongSoPhim = responseData.length;
+//
+//     for (const item of responseData) {
+//         ketQua.push({
+//             id: item.id,
+//             title: item.title,
+//             original_title: item.original_title,
+//             slug: item.slug,
+//             description: item.description,
+//             release_date: item.release_date ? new Date(item.release_date) : undefined,
+//             duration: item.duration,
+//             poster_url: item.poster_url,
+//             banner_url: item.banner_url,
+//             trailer_url: item.trailer_url,
+//             status: item.status,
+//             type: item.type,
+//             country: item.country,
+//             director: item.director,
+//             cast: item.cast,
+//             rating: item.rating,
+//             views: item.views || 0,
+//             created_at: item.created_at ? new Date(item.created_at) : new Date(),
+//             updated_at: item.updated_at ? new Date(item.updated_at) : new Date(),
+//             genres: item.genres || [],
+//             episodes: item.episodes || [],
+//             comments: item.comments || [],
+//             reviews: item.reviews || [],
+//             favorites: item.favorites || []
+//         });
+//     }
+//
+//     return { ketQua: ketQua, tongSoTrang: tongSoTrang, tongSoPhim: tongSoPhim  };
+// }
 async function layDanhSachPhim(duongDan: string): Promise<KetQuaInterface> {
     const ketQua: Movie[] = [];
-    
+
     const response = await my_request(duongDan);
-    
-    // NestJS trả về array trực tiếp, không có _embedded
-    const responseData = Array.isArray(response) ? response : response.data;
-    
-    // Giả lập pagination (có thể thêm vào NestJS sau)
-    const tongSoTrang = 1; // Default nếu không có pagination
-    const tongSoPhim = responseData.length;
-    
-    for (const item of responseData) {
+
+    // Nếu response là object có trường movies (phân trang)
+    let moviesArray: any[] = [];
+    let tongSoTrang = 0;
+    let tongSoPhim = 0;
+
+    if (response && typeof response === 'object' && !Array.isArray(response)) {
+        if ('movies' in response && Array.isArray(response.movies)) {
+            moviesArray = response.movies;
+            tongSoTrang = response.totalPages || 0;
+            tongSoPhim = response.total || moviesArray.length;
+        } else {
+            // Trường hợp khác, có thể response là object phim chi tiết
+            moviesArray = [response];
+            tongSoTrang = 1;
+            tongSoPhim = 1;
+        }
+    } else if (Array.isArray(response)) {
+        // Nếu API trả về mảng phim trực tiếp
+        moviesArray = response;
+        tongSoTrang = 1;  // hoặc bạn tự giả lập
+        tongSoPhim = moviesArray.length;
+    } else {
+        // fallback
+        moviesArray = [];
+        tongSoTrang = 0;
+        tongSoPhim = 0;
+    }
+
+    for (const item of moviesArray) {
         ketQua.push({
             id: item.id,
             title: item.title,
@@ -48,8 +112,8 @@ async function layDanhSachPhim(duongDan: string): Promise<KetQuaInterface> {
             favorites: item.favorites || []
         });
     }
-    
-    return { ketQua: ketQua, tongSoTrang: tongSoTrang, tongSoPhim: tongSoPhim };
+
+    return { ketQua, tongSoTrang, tongSoPhim };
 }
 
 //Lấy tất cả phim với phân trang
@@ -71,9 +135,9 @@ export async function timKiemPhim(tuKhoaTimKiem: string, idGenre: number): Promi
     if (tuKhoaTimKiem !== '' && idGenre === 0) {
         duongDan = endpointBe + `/movies/search?title=${tuKhoaTimKiem}`;
     } else if (tuKhoaTimKiem === '' && idGenre > 0) {
-        duongDan = endpointBe + `/movies/genre/${idGenre}`;
+        duongDan = endpointBe + `/movies/search/${idGenre}`;
     } else if (tuKhoaTimKiem !== '' && idGenre > 0) {
-        duongDan = endpointBe + `/movies/search?title=${tuKhoaTimKiem}&genreId=${idGenre}`;
+        duongDan = endpointBe + `/movies/search?title=${tuKhoaTimKiem}&idGenre=${idGenre}`;
     }
     
     return layDanhSachPhim(duongDan);
@@ -324,4 +388,25 @@ export async function layPhimLienQuan(idPhim: number, size: number = 6): Promise
         console.error("Lỗi khi lấy phim liên quan:", error);
         return [];
     }
+}
+
+export async function getMoviePoster(idPhim: number): Promise<string | null> {
+    const duongDan = endpointBe + `/movies/${idPhim}`;
+
+    try {
+        const data: Movie = await my_request(duongDan);
+        if (data && data.poster_url) {
+            return data.poster_url;
+        }
+        return null;
+    } catch (error) {
+        console.error(`Lỗi khi lấy ảnh của phim ID ${idPhim}:`, error);
+        return null;
+    }
+}
+// Lấy danh sách phim mới (có phân trang)
+export async function layPhimMoiNhat(page: number = 0  , size: number= 8  ): Promise<KetQuaInterface> {
+    // Sắp xếp theo ngày tạo mới nhất (hoặc id giảm dần nếu không có created_at)
+    const duongDan = endpointBe + `/movies/new?sort=created_at:DESC&page=${page}&size=${size}`;
+    return layDanhSachPhim(duongDan);
 }

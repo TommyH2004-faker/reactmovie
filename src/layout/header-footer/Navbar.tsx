@@ -1,3 +1,4 @@
+/*
 // import { useEffect, useState } from "react";
 // import './Navbar.css';
 // import { useAuth } from "../../utils/AuthContext";
@@ -116,7 +117,7 @@
 //                     </ul>
 //                 </div>
 //
-//                 {/* Tìm kiếm */}
+//                 {/!* Tìm kiếm *!/}
 //                 <div className="d-flex">
 //                     <input className="form-control me-2" type="search" placeholder="Tìm kiếm" aria-label="Search"
 //                            onChange={onsearchInputChange} value={tuKhoaTamThoi}/>
@@ -126,7 +127,7 @@
 //                 </div>
 //
 //
-//                 {/* Biểu tượng đăng nhập */}
+//                 {/!* Biểu tượng đăng nhập *!/}
 //                 {!isToken() && (
 //                     <div>
 //                         <Link to={"/dangnhap"}>
@@ -139,7 +140,7 @@
 //                 )}
 //                 {isToken() && (
 //                     <>
-//                         {/* <!-- Notifications --> */}
+//                         {/!* <!-- Notifications --> *!/}
 //                         <div className='dropdown'>
 //                             <a
 //                                 className='text-reset me-3 dropdown-toggle hidden-arrow'
@@ -175,7 +176,7 @@
 //                                 </li>
 //                             </ul>
 //                         </div>
-//                         {/* <!-- Avatar --> */}
+//                         {/!* <!-- Avatar --> *!/}
 //                         <div className='dropdown'>
 //                             <a
 //                                 className='dropdown-toggle d-flex align-items-center hidden-arrow'
@@ -275,7 +276,7 @@ export default function Navbar({ tuKhoaTimKiem, setTuKhoaTimKiem }: NavbarProps)
     const handleSearch = () => {
         if (!tuKhoaTamThoi.trim()) return;
         setTuKhoaTimKiem(tuKhoaTamThoi);
-        navigate(`/tim-kiem?q=${encodeURIComponent(tuKhoaTamThoi)}`);
+        navigate(`/movies/search?title=${encodeURIComponent(tuKhoaTamThoi)}`);
     };
 
     if (["/admin"].includes(location.pathname)) return null;
@@ -345,6 +346,141 @@ export default function Navbar({ tuKhoaTimKiem, setTuKhoaTimKiem }: NavbarProps)
                             >
                 Đăng xuất
               </span>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </header>
+    );
+}
+*/
+import { useEffect, useState } from "react";
+import "./Navbar.css";
+import { useAuth } from "../../utils/AuthContext";
+import { Genre } from "../../types/genre";
+import { getAllGenres } from "../../api/genreApi";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { getAvatarByToken, getRoleByToken, getUserNameByToken, isToken, logout } from "../../utils/JwtService";
+import { Avatar, Button, IconButton } from "@mui/material";
+import { Search, X } from "react-bootstrap-icons";
+
+interface NavbarProps {
+    tuKhoaTimKiem: string;
+    setTuKhoaTimKiem: (tuKhoa: string) => void;
+}
+
+export default function Navbar({ tuKhoaTimKiem, setTuKhoaTimKiem }: NavbarProps) {
+    const [tuKhoaTamThoi, setTuKhoaTamThoi] = useState("");
+    const { setLoggedIn } = useAuth();
+    const [genreList, setGenreList] = useState<Genre[]>([]);
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        getAllGenres()
+            .then((genres) => setGenreList(genres))
+            .catch((err) => console.error("Error fetching genres:", err.message));
+    }, []);
+
+    const handleSearch = () => {
+        if (!tuKhoaTamThoi.trim()) return;
+        setTuKhoaTimKiem(tuKhoaTamThoi);
+        navigate(`/movies/search?title=${encodeURIComponent(tuKhoaTamThoi)}`);
+    };
+
+    const handleClear = () => {
+        setTuKhoaTamThoi("");
+        setTuKhoaTimKiem("");
+        // Nếu muốn, có thể điều hướng về trang gốc hoặc trang tìm kiếm rỗng:
+        navigate(`/movies/search`);
+    };
+
+    if (["/admin"].includes(location.pathname)) return null;
+
+    return (
+        <header className="navbar-container">
+            <div className="navbar-logo">
+                <Link to="/">
+                    <img
+                        src="https://res.cloudinary.com/duhi7od89/image/upload/v1754714395/d15629_cjyuei.jpg"
+                        alt="Logo"
+                    />
+                </Link>
+            </div>
+
+            <nav className="navbar-links">
+                <NavLink to="/" end>Trang chủ</NavLink>
+                <div className="dropdown">
+                    <span className="dropdown-title">Thể loại</span>
+                    <div className="dropdown-menu">
+                        {genreList.map((genre) => (
+                            <Link key={genre.id} to={`/search/${genre.id}`}>{genre.name}</Link>
+                        ))}
+                    </div>
+                </div>
+                <NavLink to="/phim-moi">Phim Mới</NavLink>
+                <NavLink to="/phim-le">Phim Lẻ</NavLink>
+                <NavLink to="/phim-bo">Phim Bộ</NavLink>
+                <NavLink to="/phim-chieu-rap">Phim Chiếu Rạp</NavLink>
+                <NavLink to="/phim-tron-bo">Phim Trọn Bộ</NavLink>
+            </nav>
+
+            <div className="navbar-search" style={{ position: 'relative' }}>
+                <input
+                    type="text"
+                    placeholder="Tìm kiếm..."
+                    value={tuKhoaTamThoi}
+                    onChange={(e) => setTuKhoaTamThoi(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    style={{ paddingRight: '30px' }} // chừa chỗ cho nút X
+                />
+                {tuKhoaTamThoi && (
+                    <IconButton
+                        onClick={handleClear}
+                        size="small"
+                        style={{
+                            position: 'absolute',
+                            right: 35,
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            padding: 2,
+                        }}
+                        aria-label="clear search"
+                    >
+                        <X size={16} />
+                    </IconButton>
+                )}
+                <button onClick={handleSearch} aria-label="search button">
+                    <Search />
+                </button>
+            </div>
+
+            {!isToken() ? (
+                <div className="navbar-auth">
+                    <Link to="/dangnhap"><Button variant="contained">Đăng nhập</Button></Link>
+                    <Link to="/dangky"><Button variant="outlined" color="secondary">Đăng ký</Button></Link>
+                </div>
+            ) : (
+                <div className="navbar-user">
+                    <div className="dropdown">
+                        <Avatar
+                            alt={getUserNameByToken()?.toUpperCase()}
+                            src={getAvatarByToken()}
+                            sx={{ width: 35, height: 35 }}
+                        />
+                        <div className="dropdown-menu right">
+                            <Link to="/profile">Thông tin cá nhân</Link>
+                            <Link to="/my-favorite-movie">Phim yêu thích</Link>
+                            {getRoleByToken() === "ADMIN" && <Link to="/admin/dashboard">Quản lý</Link>}
+                            <span
+                                className="logout-btn"
+                                onClick={() => {
+                                    logout(navigate);
+                                    setLoggedIn(false);
+                                }}
+                            >
+                                Đăng xuất
+                            </span>
                         </div>
                     </div>
                 </div>
