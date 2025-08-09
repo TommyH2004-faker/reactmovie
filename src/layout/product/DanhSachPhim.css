@@ -187,8 +187,6 @@
     }
 }
 
-@media (maxgap: 12px;
-}
 
 .movie-card {
     height: 320px;
@@ -196,5 +194,4 @@
 
 .movie-image {
     height: 250px;
-}
 }
