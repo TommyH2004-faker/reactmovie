@@ -1,0 +1,169 @@
+/* Tổng thể Navbar */
+.navbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #111;
+    padding: 8px 20px;
+    color: white;
+    flex-wrap: wrap; /* Cho phép xuống dòng khi thiếu chỗ */
+}
+
+.navbar-logo img {
+    height: 50px;
+    max-width: 100%;
+}
+
+/* Liên kết chính */
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap; /* Gộp xuống dòng nếu màn nhỏ */
+}
+
+.navbar-links a {
+    color: white;
+    text-decoration: none;
+    padding: 6px 10px;
+    transition: color 0.2s ease;
+    white-space: nowrap; /* Không xuống dòng từng chữ */
+}
+
+.navbar-links a:hover {
+    color: #ff4444;
+}
+
+/* Dropdown */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-title {
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 280px;
+    background: #1a1a1a;
+    border-radius: 6px;
+    padding: 12px;
+    display: none;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+    z-index: 999;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: grid;
+}
+
+/* Mục trong dropdown */
+.dropdown-menu a {
+    color: #ddd;
+    background: #222;
+    padding: 6px 8px;
+    border-radius: 4px;
+    text-decoration: none;
+    text-align: center;
+    font-size: 14px;
+    transition: background 0.2s ease;
+}
+
+.dropdown-menu a:hover {
+    background: #ff4444;
+    color: white;
+}
+
+/* Tìm kiếm */
+.navbar-search {
+    display: flex;
+    align-items: center;
+    background: #222;
+    padding: 4px;
+    border-radius: 6px;
+    flex-shrink: 0; /* Không bị co lại */
+}
+
+.navbar-search input {
+    background: transparent;
+    border: none;
+    color: white;
+    outline: none;
+    padding: 4px 8px;
+    min-width: 120px;
+}
+
+.navbar-search button {
+    background: #ff4444;
+    border: none;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.navbar-search button:hover {
+    background: #e63636;
+}
+
+/* Auth buttons */
+.navbar-auth {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.navbar-user {
+    position: relative;
+}
+
+.navbar-user .dropdown-menu.right {
+    right: 0;
+    left: auto;
+}
+
+.logout-btn {
+    cursor: pointer;
+    color: #ff4444;
+}
+
+.logout-btn:hover {
+    text-decoration: underline;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+    .navbar-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .navbar-links {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .navbar-search {
+        width: 100%;
+    }
+
+    .navbar-search input {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .dropdown-menu {
+        position: static;
+        display: grid;
+        width: 100%;
+        margin-top: 5px;
+    }
+}

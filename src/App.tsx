@@ -1,26 +1,31 @@
 import React from 'react';
-import logo from './logo.svg';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import { BrowserRouter } from 'react-router';
+import Navbar from './layout/header-footer/Navbar';
+import { AuthProvider } from './utils/AuthContext';
+import Footer from "./layout/header-footer/Footer";
+
+
+
+const MyRoutes = () => {
+    const [tuKhoaTimKiem, setTuKhoaTimKiem] = React.useState('');
+    return (
+        <div className="app-container">
+            <AuthProvider>
+                <Navbar tuKhoaTimKiem={tuKhoaTimKiem} setTuKhoaTimKiem={setTuKhoaTimKiem} />
+                <Footer/>
+            </AuthProvider>
+        </div>
+    );
+}
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <BrowserRouter>
+            <MyRoutes />
+        </BrowserRouter>
+    );
 }
 
 export default App;
