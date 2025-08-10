@@ -21,7 +21,7 @@ function HomePage({ tuKhoaTimKiem }: HomePageProps) {
         idGenreNumber = 0;
     }
 
-    return (
+    /*return (
         <div>
             <Carousel />
             <div className="container mt-4">
@@ -32,6 +32,23 @@ function HomePage({ tuKhoaTimKiem }: HomePageProps) {
 
             </div>
         </div>
+    );
+}*/
+    return (
+        <main>
+            {/* Carousel nằm riêng, không dính navbar */}
+            <section>
+                <Carousel />
+            </section>
+
+            {/* Nội dung chính trong container bootstrap */}
+            <section className="container mt-4">
+                <h2 className="text-center mt-4">DANH SÁCH PHIM</h2>
+                <DanhSachPhim tuKhoaTimKiem={tuKhoaTimKiem} idGenre={idGenreNumber} />
+                <h2 className="text-center">PHIM MỚI</h2>
+                <PhimMoi />
+            </section>
+        </main>
     );
 }
 

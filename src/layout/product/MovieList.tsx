@@ -111,7 +111,7 @@ const MovieList: React.FC<MovieListProps> = ({
     if (!movieList || movieList.length === 0) {
         return (
             <div className="container mb-5 px-5 bg-light">
-                <h2 className="mt-4 px-3 py-3 mb-0">
+                <h2 className="mt-4 px-3 py-3 mb-0 text-dark">
                     Không tìm thấy phim nào theo yêu cầu! "{keySearch}"
                 </h2>
             </div>

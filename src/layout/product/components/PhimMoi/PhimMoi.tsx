@@ -15,7 +15,7 @@ function PhimMoi() {
 
     useEffect(() => {
         setDangTaiDuLieu(true);
-        layPhimMoiNhat(0, 8)
+        layPhimMoiNhat(0, 4)
             .then(data => {
                 setMovies(data.ketQua);
                 setDangTaiDuLieu(false);
@@ -48,7 +48,7 @@ function PhimMoi() {
             <div className="movie-list">
                 {movies.map(movie => (
                     <div key={movie.id} className="movie-card">
-                        <Link to={`/movies/${movie.id}`}>
+                        <Link to={`/movies/${movie.id}`} className="movie-poster-container">
                             <img
                                 src={movie.poster_url}
                                 alt={movie.title}

@@ -410,3 +410,18 @@ export async function layPhimMoiNhat(page: number = 0  , size: number= 8  ): Pro
     const duongDan = endpointBe + `/movies/new?sort=created_at:DESC&page=${page}&size=${size}`;
     return layDanhSachPhim(duongDan);
 }
+
+export async function latPhimTheoId(idPhim: number): Promise<Movie | null> {
+    const duongDan = endpointBe + `/movies/${idPhim}`;
+
+    try {
+        const data: Movie = await my_request(duongDan);
+        if (data) {
+            return data;
+        }
+        return null;
+    } catch (error) {
+        console.error(`Lỗi khi lấy phim theo ID ${idPhim}:`, error);
+        return null;
+    }
+}

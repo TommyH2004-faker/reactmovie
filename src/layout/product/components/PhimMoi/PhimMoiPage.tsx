@@ -1,144 +1,95 @@
-/*
-import React, { useEffect, useState } from "react";
-import {layPhimMoiNhat} from "../../api/movieApi";
-import {Movie} from "../../types/movie";
-import './PhimMoi.css';
-import SaoXepHang from "../../utils/SaoXepHang";
-import DinhDangSo from "../../utils/dinhDangSo"; // Assuming you have a CSS file for styling
-import { Link } from "react-router-dom";
-
-function PhimMoi() {
-    const [movies, setMovies] = useState<Array<Movie>>([]);
-
-
-    useEffect(() => {
-       layPhimMoiNhat(0, 12).then(data => {
-            setMovies(data.ketQua);
-        });
-    }, []);
-
-    return (
-        <div>
-            <div className="movie-list">
-                {movies.map(movie => (
-                    <div key={movie.id} className="movie-card">
-                        <Link to={`/movies/${movie.id}`}>
-                        <img src={movie.poster_url} alt={movie.title} />
-                        </Link>
-                        <p>{movie.title}</p>
-                        <p>Đánh giá: {SaoXepHang(movie.rating)}</p>
-                        <p>Thời gian: {DinhDangSo(movie.duration)} phút</p>
-
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-}
-
-export default PhimMoi;
-*/
+// PhimMoiPage.tsx
 import React, { useEffect, useState } from "react";
 import { layPhimMoiNhat } from "../../../../api/movieApi";
 import { Movie } from "../../../../types/movie";
-import './PhimMoiPage.css';
-import SaoXepHang from "../../../../utils/SaoXepHang";
-import DinhDangSo from "../../../../utils/dinhDangSo";
-import { Link } from "react-router-dom";
+import MovieProps from "../../components/MovieProps";
 import { PhanTrang } from "../../../../utils/PhanTrang";
+import { Skeleton } from "@mui/material";
+import useScrollToTop from "../../../../hooks/ScrollToTop";
 
-function PhimMoiPage() {
-    const [movies, setMovies] = useState<Array<Movie>>([]);
-    const [trangHienTai, setTrangHienTai] = useState(1);
-    const [tongSoTrang, setTongSoTrang] = useState(0);
-    const [dangTaiDuLieu, setDangTaiDuLieu] = useState(true);
-    const [baoLoi, setBaoLoi] = useState<string | null>(null);
+const PhimMoiPage: React.FC = () => {
+    useScrollToTop();
+    const [movies, setMovies] = useState<Movie[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        setDangTaiDuLieu(true);
-        layPhimMoiNhat(trangHienTai - 1, 12)
-            .then(data => {
-                setMovies(data.ketQua);
-                setTongSoTrang(data.tongSoTrang);
-                setDangTaiDuLieu(false);
-            })
-            .catch(error => {
-                setBaoLoi(error.message);
-                setDangTaiDuLieu(false);
-            });
-    }, [trangHienTai]);
+        const fetchMovies = async () => {
+            setLoading(true);
+            try {
+                const response = await layPhimMoiNhat(currentPage - 1, 12);
+                setMovies(response.ketQua);
+                setTotalPages(response.tongSoTrang);
+            } catch (err: any) {
+                setError(err.message || "Có lỗi xảy ra khi tải phim mới");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const phanTrang = (trang: number) => {
-        setTrangHienTai(trang);
+        fetchMovies();
+    }, [currentPage]);
+
+    const handlePagination = (page: number) => {
+        setCurrentPage(page);
         window.scrollTo(0, 0);
     };
 
-    if (dangTaiDuLieu) {
+    if (loading) {
         return (
-            <div className="container">
-                <div className="d-flex justify-content-center">
-                    <h1>Đang tải phim mới...</h1>
+            <div className="container mb-5 py-5 px-5 bg-light">
+                <div className="row">
+                    {[...Array(8)].map((_, index) => (
+                        <div key={index} className="col-md-3 mt-3">
+                            <Skeleton variant="rectangular" height={400} />
+                        </div>
+                    ))}
                 </div>
             </div>
         );
     }
 
-    if (baoLoi) {
+    if (error) {
         return (
-            <div className="container">
-                <div className="d-flex justify-content-center">
-                    <h1>Gặp lỗi: {baoLoi}</h1>
-                </div>
+            <div className="container mb-5 px-5 bg-light">
+                <h1 className="text-danger py-5">{error}</h1>
             </div>
         );
     }
 
-    if (movies.length === 0) {
+    if (!movies || movies.length === 0) {
         return (
-            <div className="container">
-                <div className="d-flex justify-content-center">
-                    <h1>Không có phim mới nào!</h1>
-                </div>
+            <div className="container mb-5 px-5 bg-light">
+                <h2 className="mt-4 px-3 py-3 mb-0">
+                    Không có phim mới nào!
+                </h2>
             </div>
         );
     }
 
     return (
-        <div className="container">
-            <div className="movie-list">
-                {movies.map(movie => (
-                    <div key={movie.id} className="movie-card">
-                        <Link to={`/movies/${movie.id}`}>
-                            <img
-                                src={movie.poster_url}
-                                alt={movie.title}
-                                className="movie-poster"
-                            />
-                        </Link>
-                        <div className="movie-info">
-                            <h5 className="movie-title">{movie.title}</h5>
-                            <div className="movie-details">
-                                <p className="rating">
-                                    Đánh giá: {SaoXepHang(movie.rating)}
-                                </p>
-                                <p className="duration">
-                                    Thời gian: {DinhDangSo(movie.duration)} phút
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+        <div className="container mb-5 pb-5 px-5 bg-light">
+            <div className="d-flex justify-content-between align-items-center bg-light p-3 rounded">
+                <h2 className="text-dark m-0">PHIM MỚI CẬP NHẬT</h2>
+            </div>
+            <hr className="mt-0" />
+
+            <div className="row">
+                {movies.map((movie) => (
+                    <MovieProps key={movie.id} movie={movie} />
                 ))}
             </div>
 
-            <div className="d-flex justify-content-center mt-3">
-                <PhanTrang
-                    trangHienTai={trangHienTai}
-                    tongSoTrang={tongSoTrang}
-                    phanTrang={phanTrang}
-                />
-            </div>
+            <hr className="mt-5" style={{ color: "#aaa" }} />
+            <PhanTrang
+                trangHienTai={currentPage}
+                tongSoTrang={totalPages}
+                phanTrang={handlePagination}
+            />
         </div>
     );
-}
+};
 
 export default PhimMoiPage;

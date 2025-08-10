@@ -5,7 +5,6 @@ import { getIdUserByToken, isToken } from '../../../utils/JwtService';
 import {endpointBe} from "../../../utils/contant";
 import { toast } from 'react-toastify';
 import SaoXepHang from '../../../utils/SaoXepHang';
-
 interface MoviePropsInterface {
     movie: Movie;
 }
@@ -42,7 +41,7 @@ const MovieProps: React.FC<MoviePropsInterface> = ({ movie }) => {
         const token = localStorage.getItem("token");
         const url = isFavoriteMovie
             ? `${endpointBe}/favorite-movies/remove`
-            : `${endpointBe}/favorite-movies/add`;
+            : `${endpointBe}/favorites`;
 
         const body = {
             userId: getIdUserByToken(),
@@ -77,7 +76,7 @@ const MovieProps: React.FC<MoviePropsInterface> = ({ movie }) => {
     return (
         <div className="col-md-3 mt-2">
             <div className="card shadow-sm h-100">
-                <Link to={`/movie/${movie.id}`}>
+                <Link to={`/movies/${movie.id}`}>
                     <img
                         src={movie.poster_url || '/path-to-default-image.jpg'}
                         className="card-img-top"
@@ -104,14 +103,13 @@ const MovieProps: React.FC<MoviePropsInterface> = ({ movie }) => {
                     </Link>
 
                     <div className="movie-info text-center mb-2">
-                        <span className="badge bg-primary me-2">
-                            {movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}
+                        <span className="badge bg-danger me-2">
+                            {movie.country}
                         </span>
                         <span className="badge bg-secondary">
-                            {movie.duration} phút
+                          Time:{movie.duration} phút
                         </span>
                     </div>
-
                     <div className="d-flex justify-content-between align-items-center mt-auto">
                         <div className="movie-rating">
                             <i className="fas fa-star text-warning"></i>
