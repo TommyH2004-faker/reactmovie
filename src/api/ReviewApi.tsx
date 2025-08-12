@@ -59,3 +59,15 @@ export async function getReviewsByMovie(movieId: number): Promise<Review[]> {
         return [];
     }
 }
+
+export async function getMovieBySlugGenre(slug: string): Promise<any> {
+    const url = `${endpointBe}/movies/slug/${slug}`;
+    try {
+        const response = await my_request(url);
+        return response;
+    } catch (error) {
+        console.error("Error fetching movie by slug:", error);
+        return null;
+    }
+}
+

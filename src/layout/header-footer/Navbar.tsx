@@ -108,7 +108,7 @@ export default function Navbar({ tuKhoaTimKiem, setTuKhoaTimKiem }: NavbarProps)
                         ))}
                     </div>
                 </div>
-                <NavLink to="/phim-moi" onClick={() => setMenuOpen(false)}>Phim Mới</NavLink>
+                <NavLink to="phim-moi" onClick={() => setMenuOpen(false)}>Phim Mới</NavLink>
                 <NavLink to="/phim-le" onClick={() => setMenuOpen(false)}>Phim Lẻ</NavLink>
                 <NavLink to="/phim-bo" onClick={() => setMenuOpen(false)}>Phim Bộ</NavLink>
                 <NavLink to="/phim-chieu-rap" onClick={() => setMenuOpen(false)}>Phim Chiếu Rạp</NavLink>

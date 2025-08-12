@@ -36,7 +36,7 @@ const ReviewPage: React.FC = () => {
             alert("You must be logged in to add a review.");
             return;
         }
-        // TODO: API thêm review
+
     };
 
     const handleDeleteReview = async (reviewId: number) => {

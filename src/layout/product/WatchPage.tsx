@@ -5,7 +5,6 @@ import { layPhimById } from "../../api/movieApi";
 import { Movie } from "../../types/movie";
 import "./WatchPage.css";
 import CommentPage from "./components/Comments/CommentPage";
-import ReviewPage from "./components/Review/ReviewPage";
 
 const WatchPage: React.FC = () => {
     const { movieId, episodeId } = useParams();
