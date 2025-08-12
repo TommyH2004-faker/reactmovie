@@ -1,7 +1,7 @@
 import { Movie } from "./movie";
 import { User } from "./user";
 
-export class Comment {
+export class CommentMovie {
   id: number;
   content: string;
   user: User;

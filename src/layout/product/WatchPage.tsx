@@ -1,8 +1,11 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { layPhimById } from "../../api/movieApi";
 import { Movie } from "../../types/movie";
 import "./WatchPage.css";
+import CommentPage from "./components/Comments/CommentPage";
+import ReviewPage from "./components/Review/ReviewPage";
 
 const WatchPage: React.FC = () => {
     const { movieId, episodeId } = useParams();
@@ -19,6 +22,7 @@ const WatchPage: React.FC = () => {
 
                 const response = await layPhimById(movieIdNumber);
                 setMovie(response);
+                console.log("Du lieu tra ve : ", response);
             } catch (err: any) {
                 setError(err.message || "Failed to fetch movie details");
             } finally {
@@ -45,15 +49,29 @@ const WatchPage: React.FC = () => {
         );
     }
 
+    // 🔹 Lấy tập hiện tại dựa vào episodeId, hoặc mặc định tập đầu tiên
+    const currentEpisode =
+        episodeId
+            ? movie.episodes?.find((ep) => String(ep.id) === episodeId)
+            : movie.episodes?.[0];
+
     return (
         <div className="watch-page">
             <div className="video-player">
+               {/* <iframe
+                    src={currentEpisode?.video_url || movie.trailer_url || `/default-video.mp4`}
+                    title={currentEpisode?.title || movie.title || "Video Player"}
+                    frameBorder="0"
+                    allowFullScreen
+                ></iframe>*/}
                 <iframe
-                    src={movie.trailer_url || `/default-video.mp4`}
-                    title={movie.title || "Video Player"}
+                    key={episodeId} // 👈 Thêm cái này
+                    src={currentEpisode?.video_url || movie.trailer_url || `/default-video.mp4`}
+                    title={currentEpisode?.title || movie.title || "Video Player"}
                     frameBorder="0"
                     allowFullScreen
                 ></iframe>
+
             </div>
 
             <div className="movie-info">
@@ -64,7 +82,7 @@ const WatchPage: React.FC = () => {
             <div className="episode-list">
                 <h3>Danh sách tập</h3>
                 <div className="episodes">
-                    {movie.episodes?.map((episode: { id: number }, index: number) => (
+                    {movie.episodes?.map((episode, index) => (
                         <Link
                             key={episode.id}
                             to={`/watch/${movie.id}/episode/${episode.id}`}
@@ -78,14 +96,19 @@ const WatchPage: React.FC = () => {
 
             <div className="related-movies">
                 <h3>Phim liên quan</h3>
-                <div className="related-list">
-                    {movie.genres?.map((genre: { id: number; name: string }) => (
-                        <Link key={genre.id} to={`/genre/${genre.id}`} className="related-item">
-                            {genre.name}
-                        </Link>
-                    ))}
-                </div>
+                <p className="related-hint">Click vào thể loại để xem các phim tương tự</p>
+                {movie.genres?.map((genre) => (
+                    <Link
+                        key={genre.id}
+                        to={`/search?genreId=${genre.id}`}
+                        className="related-item"
+                    >
+                        {genre.name}
+                    </Link>
+                ))}
             </div>
+
+            <CommentPage />
         </div>
     );
 };

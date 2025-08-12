@@ -8,49 +8,6 @@ interface KetQuaInterface {
     tongSoPhim: number;
 }
 
-// async function layDanhSachPhim(duongDan: string): Promise<KetQuaInterface> {
-//     const ketQua: Movie[] = [];
-//
-//     const response = await my_request(duongDan);
-//
-//     // NestJS trả về array trực tiếp, không có _embedded
-//     const responseData = Array.isArray(response) ? response : response.data;
-//
-//     // Giả lập pagination (có thể thêm vào NestJS sau)
-//     const tongSoTrang =  ;
-//     const tongSoPhim = responseData.length;
-//
-//     for (const item of responseData) {
-//         ketQua.push({
-//             id: item.id,
-//             title: item.title,
-//             original_title: item.original_title,
-//             slug: item.slug,
-//             description: item.description,
-//             release_date: item.release_date ? new Date(item.release_date) : undefined,
-//             duration: item.duration,
-//             poster_url: item.poster_url,
-//             banner_url: item.banner_url,
-//             trailer_url: item.trailer_url,
-//             status: item.status,
-//             type: item.type,
-//             country: item.country,
-//             director: item.director,
-//             cast: item.cast,
-//             rating: item.rating,
-//             views: item.views || 0,
-//             created_at: item.created_at ? new Date(item.created_at) : new Date(),
-//             updated_at: item.updated_at ? new Date(item.updated_at) : new Date(),
-//             genres: item.genres || [],
-//             episodes: item.episodes || [],
-//             comments: item.comments || [],
-//             reviews: item.reviews || [],
-//             favorites: item.favorites || []
-//         });
-//     }
-//
-//     return { ketQua: ketQua, tongSoTrang: tongSoTrang, tongSoPhim: tongSoPhim  };
-// }
 async function layDanhSachPhim(duongDan: string): Promise<KetQuaInterface> {
     const ketQua: Movie[] = [];
 

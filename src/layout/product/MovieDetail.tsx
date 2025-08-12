@@ -162,6 +162,7 @@ import "./MovieDetail.css";
 import { getIdUserByToken, isToken } from "../../utils/JwtService";
 import { toast } from "react-toastify";
 import { endpointBe } from "../../utils/contant";
+import ReviewPage from "./components/Review/ReviewPage";
 
 const MovieDetail: React.FC = () => {
     const { movieId } = useParams();
@@ -356,6 +357,7 @@ const MovieDetail: React.FC = () => {
                     </div>
                 </div>
             </div>
+            <ReviewPage/>
         </div>
     );
 };

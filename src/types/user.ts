@@ -1,16 +1,16 @@
 import { Review } from "./review";
-import { Comment } from "./comment";
+import { CommentMovie } from "./comment";
 
 export class User {
   id: number;
-  username: string;
+  name: string;
   email: string;
   reviews?: Review[];
-  comments?: Comment[];
+  comments?: CommentMovie[];
 
-  constructor(id: number, username: string, email: string, reviews?: Review[], comments?: Comment[]) {
+  constructor(id: number, name: string, email: string, reviews?: Review[], comments?: CommentMovie[]) {
     this.id = id;
-    this.username = username;
+    this.name = name;
     this.email = email;
     this.reviews = reviews;
     this.comments = comments;

@@ -30,6 +30,7 @@ const MyRoutes = () => {
                         <Route path="/movies/:movieId" element={<MovieDetail />} />
                         <Route path='/search' element={<FillerPage />} />
                         <Route path="/watch/:movieId" element={<WatchPage />} />
+                        <Route path="/watch/:movieId/episode/:episodeId" element={<WatchPage />} />
                         {/* Thêm các route khác tại đây */}
                     </Routes>
                 </div>
