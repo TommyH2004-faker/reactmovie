@@ -163,8 +163,10 @@ import { getIdUserByToken, isToken } from "../../utils/JwtService";
 import { toast } from "react-toastify";
 import { endpointBe } from "../../utils/contant";
 import ReviewPage from "./components/Review/ReviewPage";
+import useScrollToTop from "../../hooks/ScrollToTop";
 
 const MovieDetail: React.FC = () => {
+    useScrollToTop();
     const { movieId } = useParams();
     const navigate = useNavigate();
     const [isFavoriteMovie, setIsFavoriteMovie] = useState(false);

@@ -40,7 +40,7 @@ function PhimMoi() {
         <div className="container">
             <div className="section-header">
                 <h2 className="section-title">Phim Mới</h2>
-                <Link to="/phim-moi" className="view-more-btn">
+                <Link to="genre/phim-moi" className="view-more-btn">
                     Xem thêm
                 </Link>
             </div>

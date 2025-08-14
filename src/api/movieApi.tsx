@@ -382,3 +382,16 @@ export async function latPhimTheoId(idPhim: number): Promise<Movie | null> {
         return null;
     }
 }
+export async function layPhimByslug(slug: string): Promise<Movie | null> {
+    const duongDan = endpointBe + `/movies/slug/${slug}`;
+    try {
+        const data: Movie = await my_request(duongDan);
+        if (data) {
+            return data;
+        }
+        return null;
+    } catch (error) {
+        console.error(`Lỗi khi lấy phim theo slug ${slug}:`, error);
+        return null;
+    }
+}

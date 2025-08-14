@@ -70,20 +70,6 @@ export default function Navbar({ tuKhoaTimKiem, setTuKhoaTimKiem }: NavbarProps)
 
             <nav className={`navbar-links ${menuOpen ? "open" : ""}`}>
                 <NavLink to="/" end onClick={() => setMenuOpen(false)}>Trang chủ</NavLink>
-               {/* <div className="dropdown">
-                    <span className="dropdown-title">Thể loại</span>
-                    <div className="dropdown-menu">
-                        {genreList.map((genre) => (
-                            <Link
-                                key={genre.id}
-                                to={`/movies/genre/${genre.id}`}
-                                onClick={() => setMenuOpen(false)}
-                            >
-                                {genre.name}
-                            </Link>
-                        ))}
-                    </div>
-                </div>*/}
                 <div className={`dropdown ${activeDropdown === 'genres' ? 'active' : ''}`}>
                   <span
                       className="dropdown-title"
@@ -108,11 +94,11 @@ export default function Navbar({ tuKhoaTimKiem, setTuKhoaTimKiem }: NavbarProps)
                         ))}
                     </div>
                 </div>
-                <NavLink to="phim-moi" onClick={() => setMenuOpen(false)}>Phim Mới</NavLink>
-                <NavLink to="/phim-le" onClick={() => setMenuOpen(false)}>Phim Lẻ</NavLink>
-                <NavLink to="/phim-bo" onClick={() => setMenuOpen(false)}>Phim Bộ</NavLink>
-                <NavLink to="/phim-chieu-rap" onClick={() => setMenuOpen(false)}>Phim Chiếu Rạp</NavLink>
-                <NavLink to="/phim-tron-bo" onClick={() => setMenuOpen(false)}>Phim Trọn Bộ</NavLink>
+                <NavLink to="genre/phim-moi" onClick={() => setMenuOpen(false)}>Phim Mới</NavLink>
+                <NavLink to="genre/phim-le" onClick={() => setMenuOpen(false)}>Phim Lẻ</NavLink>
+                <NavLink to="genre/phim-bo" onClick={() => setMenuOpen(false)}>Phim Bộ</NavLink>
+                <NavLink to="genre/phim-chieu-rap" onClick={() => setMenuOpen(false)}>Phim Chiếu Rạp</NavLink>
+                <NavLink to="genre/phim-tron-bo" onClick={() => setMenuOpen(false)}>Phim Trọn Bộ</NavLink>
             </nav>
 
             <div className="navbar-search" style={{ position: 'relative' }}>

@@ -27,9 +27,10 @@ const MyRoutes = () => {
                         <Route path="" element={<HomePage tuKhoaTimKiem={tuKhoaTimKiem} />} />
                         <Route path="search/:idGenre" element={<HomePage tuKhoaTimKiem={tuKhoaTimKiem} />} />
                         <Route path="movies/search" element={<HomePage tuKhoaTimKiem={tuKhoaTimKiem} />} />
-                        <Route path="/phim-moi" element={<PhimMoiPage />} />
+                      {/*  <Route path="/phim-moi" element={<PhimMoiPage />} />*/}
                         <Route path="/movies/:movieId" element={<MovieDetail />} />
                         <Route path='/search' element={<FillerPage />} />
+                        <Route path="genre/:genreSlug" element={<MoviesPage />} />
                         <Route path="/:genreSlug" element={<MoviesPage />} />
                         <Route path="/watch/:movieId" element={<WatchPage />} />
                         <Route path="/watch/:movieId/episode/:episodeId" element={<WatchPage />} />

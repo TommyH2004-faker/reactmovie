@@ -1,6 +1,8 @@
 import { Review } from "../types/review";
 import { endpointBe } from "../utils/contant";
 import { my_request } from "../utils/Request";
+import {Genre} from "../types/genre";
+import {Movie} from "../types/movie";
 
 // Fetch all reviews
 export async function getReviews(): Promise<Review[]> {
@@ -60,8 +62,8 @@ export async function getReviewsByMovie(movieId: number): Promise<Review[]> {
     }
 }
 
-export async function getMovieBySlugGenre(slug: string): Promise<any> {
-    const url = `${endpointBe}/movies/slug/${slug}`;
+/*export async function getMovieBySlugGenre(slug: string): Promise<any> {
+    const url = `${endpointBe}/genres/slug/${slug}`;
     try {
         const response = await my_request(url);
         return response;
@@ -69,5 +71,29 @@ export async function getMovieBySlugGenre(slug: string): Promise<any> {
         console.error("Error fetching movie by slug:", error);
         return null;
     }
+}*/
+// ReviewApi.tsx
+interface MovieApiResponse {
+    id: number;
+    name: string;
+    slug: string;
+    movies: Movie[];
+    created_at: string;
+    updated_at: string;
 }
+
+export async function getMovieBySlugGenre(slug: string): Promise<MovieApiResponse[]> {
+    const duongDan = `${endpointBe}/genres/slug/${slug}`;
+    try {
+        const response = await my_request(duongDan);
+        console.log('API Response:', response);
+        return response;
+    } catch (error) {
+        console.error("Error fetching movies by genre slug:", error);
+        throw error;
+    }
+}
+
+
+
 
