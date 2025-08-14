@@ -10,6 +10,7 @@ export interface JwtPayload {
 	exp: number;
 	id: number;
 	avatar: string;
+	enabled: boolean;
 }
 
 const RequireAdmin = <P extends object>(
@@ -19,7 +20,7 @@ const RequireAdmin = <P extends object>(
 		const navigate = useNavigate();
 
 		useEffect(() => {
-			const token = localStorage.getItem("token");
+			const token = localStorage.getItem("access_token");
 
 			if (!token) {
 				navigate("/dangnhap");

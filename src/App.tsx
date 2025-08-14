@@ -13,6 +13,7 @@ import FillerPage from "./page/FillerPage/FillerPage";
 import { ToastContainer } from 'react-toastify';
 import WatchPage from "./layout/product/WatchPage";
 import MoviesPage from "./layout/product/MoviesPage";
+import DangNhap from "./layout/User/DangNhap";
 
 const MyRoutes = () => {
     const [tuKhoaTimKiem, setTuKhoaTimKiem] = React.useState('');
@@ -34,6 +35,7 @@ const MyRoutes = () => {
                         <Route path="/:genreSlug" element={<MoviesPage />} />
                         <Route path="/watch/:movieId" element={<WatchPage />} />
                         <Route path="/watch/:movieId/episode/:episodeId" element={<WatchPage />} />
+                        <Route path="/dangnhap" element={<DangNhap/>} />
                         {/* Thêm các route khác tại đây */}
                     </Routes>
                 </div>
