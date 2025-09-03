@@ -4,7 +4,6 @@ import { useAuth } from "../../utils/AuthContext";
 import useScrollToTop from "../../hooks/ScrollToTop";
 import { endpointBe } from "../../utils/contant";
 import { toast } from "react-toastify";
-import { getProfile } from "../../utils/auth";
 import {
     Box,
     Button,
@@ -23,6 +22,7 @@ import {
 } from "@mui/icons-material";
 import {jwtDecode} from "jwt-decode";
 import {JwtPayload} from "../../admin/RequireAdmin";
+import { getRoleByToken } from "../../utils/JwtService";
 
 const DangNhap: React.FC = () => {
     useScrollToTop();
@@ -34,10 +34,13 @@ const DangNhap: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
-        if (isLoggedIn) {
+    if (isLoggedIn) {
+        const role = getRoleByToken();
+        if (role !== "ADMIN") {
             navigate("/");
         }
-    }, [isLoggedIn, navigate]);
+    }
+}, [isLoggedIn, navigate]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -67,11 +70,12 @@ const DangNhap: React.FC = () => {
 
             toast.success("Đăng nhập thành công");
             setLoggedIn(true);
-
-            if (decodeToken.roles?.includes("ADMIN")) {
-                navigate("/admin");
+            const role = getRoleByToken();
+            console.log("Role from token:", role);
+              if (role === "ADMIN") {
+              navigate("/admin/dashboard"); // chuyển thẳng vào dashboard
             } else {
-                navigate("/");
+              navigate("/");
             }
         } catch (err) {
             console.error("Lỗi đăng nhập:", err);
@@ -104,85 +108,102 @@ const DangNhap: React.FC = () => {
                         Đăng Nhập
                     </Typography>
                     <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="email"
-                            label="Email"
-                            name="email"
-                            autoComplete="email"
-                            autoFocus
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <Email />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Mật khẩu"
-                            type={showPassword ? "text" : "password"}
-                            id="password"
-                            autoComplete="current-password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <Lock />
-                                    </InputAdornment>
-                                ),
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            edge="end"
-                                        >
-                                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                                        </IconButton>
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
+  <TextField
+    margin="normal"
+    required
+    fullWidth
+    id="email"
+    label="Email"
+    name="email"
+    autoComplete="email"
+    autoFocus
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    InputProps={{
+      startAdornment: (
+        <InputAdornment position="start">
+          <Email />
+        </InputAdornment>
+      ),
+    }}
+  />
+  <TextField
+    margin="normal"
+    required
+    fullWidth
+    name="password"
+    label="Mật khẩu"
+    type={showPassword ? "text" : "password"}
+    id="password"
+    autoComplete="current-password"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    InputProps={{
+      startAdornment: (
+        <InputAdornment position="start">
+          <Lock />
+        </InputAdornment>
+      ),
+      endAdornment: (
+        <InputAdornment position="end">
+          <IconButton
+            onClick={() => setShowPassword(!showPassword)}
+            edge="end"
+          >
+            {showPassword ? <VisibilityOff /> : <Visibility />}
+          </IconButton>
+        </InputAdornment>
+      ),
+    }}
+  />
 
-                        {error && (
-                            <Typography color="error" sx={{ mt: 2 }}>
-                                {error}
-                            </Typography>
-                        )}
+  {/* Thêm link Quên mật khẩu ở đây */}
+  <Box sx={{ textAlign: "right", mt: 1 }}>
+    <Link
+      to="/quenMatKhau"
+      style={{
+        textDecoration: "none",
+        color: "#1976d2",
+        fontSize: "0.875rem"
+      }}
+    >
+      Quên mật khẩu?
+    </Link>
+  </Box>
 
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                        >
-                            Đăng Nhập
-                        </Button>
+  {error && (
+    <Typography color="error" sx={{ mt: 2 }}>
+      {error}
+    </Typography>
+  )}
 
-                        <Box sx={{ textAlign: 'right', mt: 1 }}>
-                            <Typography variant="body2">
-                                Bạn chưa có tài khoản?{' '}
-                                <Link
-                                    to="/dangKy"
-                                    style={{
-                                        textDecoration: 'none',
-                                        color: '#1976d2'
-                                    }}
-                                >
-                                    Đăng ký
-                                </Link>
-                            </Typography>
-                        </Box>
-                    </Box>
+  <Button
+    type="submit"
+    fullWidth
+    variant="contained"
+    sx={{ mt: 3, mb: 2 }}
+  >
+    Đăng Nhập
+  </Button>
+
+  <Box sx={{ textAlign: 'right', mt: 1 }}>
+    <Typography variant="body2">
+      Bạn chưa có tài khoản?{' '}
+      <Link
+        to="/dangKy"
+        style={{
+          textDecoration: 'none',
+          color: '#1976d2'
+        }}
+      >
+        Đăng ký
+      </Link>
+    </Typography>
+  </Box>
+</Box>
+
+
+
                 </Paper>
             </Box>
         </Container>

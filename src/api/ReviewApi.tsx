@@ -1,7 +1,6 @@
 import { Review } from "../types/review";
 import { endpointBe } from "../utils/contant";
 import { my_request } from "../utils/Request";
-import {Genre} from "../types/genre";
 import {Movie} from "../types/movie";
 
 // Fetch all reviews
@@ -16,40 +15,44 @@ export async function getReviews(): Promise<Review[]> {
     }
 }
 
-// Add a new review
-export async function addReview(rating: number, comment: string): Promise<Review | null> {
-    const url = `${endpointBe}/reviews`;
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ rating, comment }),
-        });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.json();
-    } catch (error) {
-        console.error("Error adding review:", error);
-        return null;
-    }
+// Xóa review
+export async function deleteReview(reviewId: number) {
+  const token = localStorage.getItem("access_token");
+  if (!token) throw new Error("Chưa đăng nhập!");
+
+  const res = await fetch(`${endpointBe}/reviews/${reviewId}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`HTTP error! status: ${res.status}`);
+  }
+  return true;
 }
 
-// Delete a review by ID
-export async function deleteReview(reviewId: number): Promise<boolean> {
-    const url = `${endpointBe}/reviews/${reviewId}`;
-    try {
-        const response = await fetch(url, {
-            method: "DELETE",
-        });
-        return response.ok;
-    } catch (error) {
-        console.error("Error deleting review:", error);
-        return false;
-    }
+// Cập nhật review
+export async function updateReview(reviewId: number, data: { rating: number; comment: string }) {
+  const token = localStorage.getItem("access_token");
+  if (!token) throw new Error("Chưa đăng nhập!");
+
+  const res = await fetch(`${endpointBe}/reviews/${reviewId}`, {
+    method: "PATCH", // 🔥 sửa lại từ PUT → PATCH cho khớp backend
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    throw new Error(`HTTP error! status: ${res.status}`);
+  }
+  return await res.json();
 }
+
 
 export async function getReviewsByMovie(movieId: number): Promise<Review[]> {
     const url = `${endpointBe}/movies/feedback/${movieId}`;
@@ -93,6 +96,41 @@ export async function getMovieBySlugGenre(slug: string): Promise<MovieApiRespons
         throw error;
     }
 }
+
+
+interface AddReviewDto {
+  movieId: number;
+  rating: number;
+  comment: string;
+}
+
+
+// Add a new review
+export async function addReview(review: AddReviewDto): Promise<Review | null> {
+  const url = `${endpointBe}/reviews`;
+  try {
+    const token = localStorage.getItem("access_token"); // nhớ dùng đúng key mà bạn lưu token
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(review), // không gửi userId ở đây
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error adding review:", error);
+    return null;
+  }
+}
+
 
 
 

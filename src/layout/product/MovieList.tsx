@@ -16,12 +16,12 @@ interface MovieListProps {
 }
 
 const MovieList: React.FC<MovieListProps> = ({
-                                                 paginable = false,
-                                                 keySearch = "",
-                                                 size = 8,
-                                                 genreId = 0,
-                                                 filter = 0,
-                                             }) => {
+    paginable = false,
+    keySearch = "",
+    size = 8,
+    genreId = 0,
+    filter = 0,
+}) => {
     const [movieList, setMovieList] = useState<Movie[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);

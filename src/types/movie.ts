@@ -9,7 +9,7 @@ export interface Movie {
   original_title?: string; // Trường mới
   slug: string;
   description: string;
-  release_date?: Date;
+  release_date?: string | null;
   duration?: number;
   poster_url: string;
   banner_url?: string;

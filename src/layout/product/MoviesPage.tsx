@@ -3,11 +3,12 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Movie } from "../../types/movie";
 import { getMovieBySlugGenre } from "../../api/ReviewApi";
-import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
 import MovieProps from "./components/MovieProps";
+import useScrollToTop from "../../hooks/ScrollToTop";
 
 export function MoviesPage() {
+    useScrollToTop();
     const { genreSlug } = useParams<{ genreSlug: string }>();
     const [genreName, setGenreName] = useState("");
     const [movies, setMovies] = useState<Movie[]>([]);

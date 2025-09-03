@@ -19,9 +19,9 @@ const Footer: React.FC = () => {
                 <div className="footer-section">
                     <h4>Trang</h4>
                     <Link to="/">Trang chủ</Link>
-                    <Link to="/phim-moi">Phim Mới</Link>
-                    <Link to="/phim-bo">Phim Bộ</Link>
-                    <Link to="/phim-le">Phim Lẻ</Link>
+                    <Link to="genre/phim-moi">Phim Mới</Link>
+                    <Link to="genre/phim-bo">Phim Bộ</Link>
+                    <Link to="genre/phim-le">Phim Lẻ</Link>
                 </div>
 
                 <div className="footer-section">

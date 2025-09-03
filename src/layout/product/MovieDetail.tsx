@@ -193,14 +193,27 @@ const MovieDetail: React.FC = () => {
         fetchMovie();
     }, [movieId]);
 
+    // useEffect(() => {
+    //     if (movie && isToken()) {
+    //         fetch(`${endpointBe}/favorite-movies/${getIdUserByToken()}`)
+    //             .then((response) => response.json())
+    //             .then((data) => setIsFavoriteMovie(data))
+    //             .catch((err) => console.error("Error checking favorite status:", err));
+    //     }
+    // }, [movie]);
     useEffect(() => {
-        if (movie && isToken()) {
-            fetch(`${endpointBe}/favorite-movies/check/${getIdUserByToken()}/${movie.id}`)
-                .then((response) => response.json())
-                .then((data) => setIsFavoriteMovie(data))
-                .catch((err) => console.error("Error checking favorite status:", err));
-        }
-    }, [movie]);
+    if (movie && isToken()) {
+        fetch(`${endpointBe}/favorite-movies/${getIdUserByToken()}`)
+            .then((response) => response.json())
+            .then((data) => {
+                // data là mảng các movie yêu thích
+                const isFavorite = data.some((fav: any) => fav.id === movie.id);
+                setIsFavoriteMovie(isFavorite);
+            })
+            .catch((err) => console.error("Error checking favorite status:", err));
+    }
+}, [movie]);
+
 
     const handleFavoriteMovie = async () => {
         if (!isToken()) {
@@ -209,10 +222,10 @@ const MovieDetail: React.FC = () => {
             return;
         }
 
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("access_token");
         const url = isFavoriteMovie
-            ? `${endpointBe}/favorite-movies/remove`
-            : `${endpointBe}/favorites`;
+            ? `${endpointBe}/favorites/remove`
+            : `${endpointBe}/favorites/add`;
 
         const body = {
             userId: getIdUserByToken(),

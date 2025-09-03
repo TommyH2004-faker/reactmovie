@@ -25,7 +25,15 @@ function PhimMoi() {
                 setDangTaiDuLieu(false);
             });
     }, []);
-
+    if(baoLoi) {
+        return (
+            <div className="container">
+                <div className="alert alert-danger" role="alert">
+                    {baoLoi}
+                </div>
+            </div>
+        );
+    }
     if (dangTaiDuLieu) {
         return (
             <div className="container">

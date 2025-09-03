@@ -6,8 +6,25 @@ import { Genre } from "../../types/genre";
 import { getAllGenres } from "../../api/genreApi";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { getAvatarByToken, getRoleByToken, getUserNameByToken, isToken, logout } from "../../utils/JwtService";
-import { Avatar, Button, IconButton } from "@mui/material";
+import { 
+    Avatar, 
+    Button, 
+    IconButton, 
+    Menu, 
+    MenuItem, 
+    ListItemIcon, 
+    ListItemText,
+    Divider,
+    Box,
+    Typography
+} from "@mui/material";
 import { Search, X, List } from "react-bootstrap-icons";
+import { 
+    Person as PersonIcon,
+    Favorite as FavoriteIcon,
+    AdminPanelSettings as AdminIcon,
+    Logout as LogoutIcon 
+} from '@mui/icons-material';
 
 interface NavbarProps {
     tuKhoaTimKiem: string;
@@ -19,6 +36,7 @@ export default function Navbar({ tuKhoaTimKiem, setTuKhoaTimKiem }: NavbarProps)
     const { setLoggedIn } = useAuth();
     const [genreList, setGenreList] = useState<Genre[]>([]);
     const [menuOpen, setMenuOpen] = useState(false); // để toggle menu mobile
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -137,29 +155,98 @@ export default function Navbar({ tuKhoaTimKiem, setTuKhoaTimKiem }: NavbarProps)
                     <Link to="/dangky"><Button variant="outlined" color="secondary">Đăng ký</Button></Link>
                 </div>
             ) : (
-                <div className="navbar-user">
-                    <div className="dropdown">
+                <Box className="navbar-user">
+                    <IconButton
+                        onClick={(event) => setAnchorEl(event.currentTarget)}
+                        size="small"
+                        sx={{ padding: 0.5 }}
+                    >
                         <Avatar
                             alt={getUserNameByToken()?.toUpperCase()}
                             src={getAvatarByToken()}
-                            sx={{ width: 35, height: 35 }}
+                            sx={{ 
+                                width: 35, 
+                                height: 35,
+                                border: '2px solid rgba(255, 255, 255, 0.2)',
+                                transition: 'border-color 0.2s',
+                                '&:hover': {
+                                    border: '2px solid rgba(255, 255, 255, 0.5)',
+                                }
+                            }}
                         />
-                        <div className="dropdown-menu right">
-                            <Link to="/profile">Thông tin cá nhân</Link>
-                            <Link to="/my-favorite-movie">Phim yêu thích</Link>
-                            {getRoleByToken() === "ADMIN" && <Link to="/admin/dashboard">Quản lý</Link>}
-                            <span
-                                className="logout-btn"
-                                onClick={() => {
-                                    logout(navigate);
-                                    setLoggedIn(false);
-                                }}
-                            >
-                                Đăng xuất
-                            </span>
-                        </div>
-                    </div>
-                </div>
+                    </IconButton>
+                    <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={() => setAnchorEl(null)}
+                        onClick={() => setAnchorEl(null)}
+                        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                        PaperProps={{
+                            elevation: 3,
+                            sx: {
+                                overflow: 'visible',
+                                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                                mt: 1.5,
+                                minWidth: 220,
+                                '&:before': {
+                                    content: '""',
+                                    display: 'block',
+                                    position: 'absolute',
+                                    top: 0,
+                                    right: 14,
+                                    width: 10,
+                                    height: 10,
+                                    bgcolor: 'background.paper',
+                                    transform: 'translateY(-50%) rotate(45deg)',
+                                    zIndex: 0,
+                                },
+                            },
+                        }}
+                    >
+                        <Box sx={{ py: 1, px: 2, borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}>
+                            <Typography variant="subtitle2" color="text.secondary">
+                                Xin chào,
+                            </Typography>
+                            <Typography variant="body1" fontWeight="500">
+                                {getUserNameByToken()}
+                            </Typography>
+                        </Box>
+                        <MenuItem component={Link} to="/profile">
+                            <ListItemIcon>
+                                <PersonIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Thông tin cá nhân</ListItemText>
+                        </MenuItem>
+                        <MenuItem component={Link} to="/my-favorite-movie">
+                            <ListItemIcon>
+                                <FavoriteIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Phim yêu thích</ListItemText>
+                        </MenuItem>
+                        {getRoleByToken() === "ADMIN" && (
+                            <MenuItem component={Link} to="/admin/dashboard">
+                                <ListItemIcon>
+                                    <AdminIcon fontSize="small" />
+                                </ListItemIcon>
+                                <ListItemText>Quản lý</ListItemText>
+                            </MenuItem>
+                        )}
+                        <Divider />
+                        <MenuItem 
+                            onClick={() => {
+                                logout(navigate);
+                                setLoggedIn(false);
+                            }}
+                            sx={{ color: 'error.main' }}
+                        >
+                            <ListItemIcon>
+                                <LogoutIcon fontSize="small" color="error" />
+                            </ListItemIcon>
+                            <ListItemText>Đăng xuất</ListItemText>
+                        </MenuItem>
+                    </Menu>
+                </Box>
             )}
         </header>
     );

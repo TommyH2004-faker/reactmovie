@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 export interface JwtPayload {
 	sub: number;
 	name: string;
-	roles: string;
+	role?: { id: number; name: string };
 	iat: number;
 	exp: number;
 	id: number;
@@ -30,9 +30,8 @@ const RequireAdmin = <P extends object>(
 			const decodedToken = jwtDecode(token) as JwtPayload;
 
 			// Lấy role từ decodedToken
-			const roles = decodedToken.roles;
-
-			if (!roles.includes("ADMIN")) {
+			const role = decodedToken.role;
+			if (!role || role.name !== "ADMIN") {
 				navigate("/bao-loi-403");
 			}
 		}, [navigate]);
