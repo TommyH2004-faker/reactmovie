@@ -86,11 +86,6 @@ const MyRoutes = () => {
             </div>
             <div className="col-10 col-md-9 col-lg-10">
               <Routes>
-                {/* <Route path="/admin/dashboard" element={<DashboardPage />} />
-                <Route path="/admin/user" element={<UserManagementPage />} />
-                <Route path="/admin/genre" element={<GenreManagementPage />} />
-                <Route path="/admin/movie" element={<MovieManagementPage />} />
-                <Route path="/admin/*" element={<Error404Page />} /> */}
                 <Route path='/admin' element={<AdminDashboard />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/movie" element={<MovieManagementPage />} />

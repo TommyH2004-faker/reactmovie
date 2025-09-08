@@ -395,3 +395,11 @@ export async function layPhimByslug(slug: string): Promise<Movie | null> {
         return null;
     }
 }
+
+// tang view 
+export async function increaseViewCount(movieId: number) {
+    return fetch(`${endpointBe}/movies/${movieId}/view`, {
+        method: "POST", 
+        headers: { "Content-Type": "application/json" }
+    });
+} 
