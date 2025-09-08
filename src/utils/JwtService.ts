@@ -61,13 +61,7 @@ export function getIdUserByToken(): number | null {
     return Number(decodedToken.sub) || null;
 }
 
-// export function getRoleByToken() {
-//    const token = localStorage.getItem('access_token');
-//    if (token) {
-//       const decodedToken = jwtDecode(token) as JwtPayload;
-//       return decodedToken.roles;
-//    }
-// }
+
 export function getRoleByToken(): string | null {
   const token = localStorage.getItem("access_token");
   if (!token) return null;
