@@ -45,35 +45,68 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
     }, [props.keyCountReload]);
 
     // Xử lý xóa user
+    // const handleDeleteUser = async (id: number) => {
+    //     const token = localStorage.getItem("access_token");
+    //
+    //     try {
+    //         await confirm({
+    //             title: "Xóa người dùng",
+    //             description: "Bạn có chắc chắn muốn xóa người dùng này không?",
+    //             confirmationText: "Xóa",
+    //             cancellationText: "Hủy"
+    //         });
+    //
+    //         const response = await fetch(`${endpointBe}/users/${id}`, {
+    //             method: "DELETE",
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`
+    //             }
+    //         });
+    //
+    //         if (!response.ok) throw new Error("Không thể xóa người dùng");
+    //
+    //         toast.success("Xóa người dùng thành công");
+    //         props.setKeyCountReload?.(Math.random());
+    //
+    //     } catch (error) {
+    //         if (error instanceof Error) {
+    //             toast.error("Lỗi: " + error.message);
+    //         }
+    //     }
+    // };
     const handleDeleteUser = async (id: number) => {
         const token = localStorage.getItem("access_token");
 
-        try {
-            await confirm({
-                title: "Xóa người dùng",
-                description: "Bạn có chắc chắn muốn xóa người dùng này không?",
-                confirmationText: "Xóa",
-                cancellationText: "Hủy"
-            });
+        const result = await confirm({
+            title: "Xóa người dùng",
+            description: "Bạn có chắc chắn muốn xóa người dùng này không?",
+            confirmationText: "Xóa",
+            cancellationText: "Hủy",
+        });
 
-            const response = await fetch(`${endpointBe}/users/${id}`, {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`
+        if (result.confirmed) {
+            try {
+                const response = await fetch(`${endpointBe}/users/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (!response.ok) throw new Error("Không thể xóa người dùng");
+
+                toast.success("Xóa người dùng thành công");
+                props.setKeyCountReload?.(Math.random());
+            } catch (error) {
+                if (error instanceof Error) {
+                    toast.error("Lỗi: " + error.message);
                 }
-            });
-
-            if (!response.ok) throw new Error("Không thể xóa người dùng");
-
-            toast.success("Xóa người dùng thành công");
-            props.setKeyCountReload?.(Math.random());
-
-        } catch (error) {
-            if (error instanceof Error) {
-                toast.error("Lỗi: " + error.message);
             }
+        } else {
+            toast.info("Đã huỷ xoá người dùng");
         }
     };
+
     const columns: GridColDef[] = [
         {
             field: "id",

@@ -10,7 +10,9 @@ import InfoIcon from "@mui/icons-material/Info";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import CategoryIcon from "@mui/icons-material/Category";
 import CommentIcon from "@mui/icons-material/Comment";
-import CommentPage from "../admin/CommnentMangement";
+import CommentPage from "./components/CommnentUser/CommentPage";
+
+
 
 const WatchPage: React.FC = () => {
   const { movieId, episodeId } = useParams();
@@ -125,7 +127,8 @@ const WatchPage: React.FC = () => {
         <h3 className="d-flex align-items-center gap-2">
           <CommentIcon color="action" /> Bình luận
         </h3>
-        <CommentPage />
+        {/*<CommentPage />*/}
+        <CommentPage/>
       </div>
     </div>
   );

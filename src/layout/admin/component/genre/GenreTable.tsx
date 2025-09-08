@@ -46,15 +46,62 @@ export const GenreTable: React.FC<GenreTableProps> = ({
     fetchGenres();
   }, [keyCountReload]);
 
+  // const handleDeleteGenre = async (id: number) => {
+  //   try {
+  //     await confirm({
+  //       title: "Xoá thể loại",
+  //       description: "Bạn chắc chắn xoá thể loại này chứ?",
+  //       confirmationText: "Xoá",
+  //       cancellationText: "Huỷ"
+  //     });
+  //
+  //     const token = localStorage.getItem("access_token");
+  //     if (!token) {
+  //       toast.error("Bạn chưa đăng nhập!");
+  //       return;
+  //     }
+  //
+  //     const response = await fetch(`${endpointBe}/genres/${id}`, {
+  //       method: 'DELETE',
+  //       headers: {
+  //         'Authorization': `Bearer ${token}`
+  //       }
+  //     });
+  //
+  //     if (!response.ok) {
+  //       throw new Error('Delete request failed');
+  //     }
+  //
+  //     toast.success("Xoá thể loại thành công");
+  //     if (setKeyCountReload) {
+  //       setKeyCountReload(Math.random());
+  //     }
+  //
+  //     toast.success("Xoá thể loại thành công");
+  //     if (setKeyCountReload) {
+  //       setKeyCountReload(Math.random());
+  //     }
+  //   } catch (error) {
+  //     if (error instanceof Error) {
+  //       toast.error("Lỗi khi xoá thể loại");
+  //       console.error(error);
+  //     }
+  //   }
+  // };
   const handleDeleteGenre = async (id: number) => {
-    try {
-      await confirm({
-        title: "Xoá thể loại",
-        description: "Bạn chắc chắn xoá thể loại này chứ?",
-        confirmationText: "Xoá",
-        cancellationText: "Huỷ"
-      });
+    const result = await confirm({
+      title: "Xoá thể loại",
+      description: "Bạn chắc chắn xoá thể loại này chứ?",
+      confirmationText: "Xoá",
+      cancellationText: "Huỷ"
+    });
 
+    if (!result.confirmed) {
+      toast.info("Đã huỷ xoá thể loại");
+      return;
+    }
+
+    try {
       const token = localStorage.getItem("access_token");
       if (!token) {
         toast.error("Bạn chưa đăng nhập!");
@@ -73,14 +120,7 @@ export const GenreTable: React.FC<GenreTableProps> = ({
       }
 
       toast.success("Xoá thể loại thành công");
-      if (setKeyCountReload) {
-        setKeyCountReload(Math.random());
-      }
-
-      toast.success("Xoá thể loại thành công");
-      if (setKeyCountReload) {
-        setKeyCountReload(Math.random());
-      }
+      setKeyCountReload?.(Math.random());
     } catch (error) {
       if (error instanceof Error) {
         toast.error("Lỗi khi xoá thể loại");

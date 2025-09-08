@@ -71,7 +71,7 @@ const MovieProps: React.FC<MoviePropsInterface> = ({ movie }) => {
 
       if (!response.ok) {
         toast.error(result?.message || "Thao tác thất bại");
-        return; // ❌ dừng lại, không toggle state
+        return;
       }
       setIsFavoriteMovie(!isFavoriteMovie);
       toast.success(

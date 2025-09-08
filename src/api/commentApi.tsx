@@ -2,6 +2,7 @@
 import { endpointBe } from "../utils/contant";
 import { my_request } from "../utils/Request";
 import {CommentMovie} from "../types/comment";
+import {toast} from "react-toastify";
 
 // Fetch all comments
 export async function getComments(): Promise<CommentMovie[]> {
@@ -29,7 +30,13 @@ export async function getCommentsByMovie(movieId: number): Promise<CommentMovie[
 
 // Thêm comment mới
 export async function addComment(data: { movieId: number; content: string }) {
-  const url = `${endpointBe}/comments`;
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+        toast.error("Bạn cần đăng nhập để bình luận");
+        return;
+    }
+
+    const url = `${endpointBe}/comments`;
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -82,6 +89,22 @@ export async function deleteCommentAdmin(commentId: number) {
     console.error("Error deleting comment:", error);
     return false;
   }
+}
+
+export async function deleteComment(commentId: number) {
+    const url = `${endpointBe}/comments/${commentId}`;
+    try {
+        const response = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+        });
+        return response.ok;
+    } catch (error) {
+        console.error("Error deleting comment:", error);
+        return false;
+    }
 }
 
 export const updateCommentAdmin = async (id: number, payload: any) => {

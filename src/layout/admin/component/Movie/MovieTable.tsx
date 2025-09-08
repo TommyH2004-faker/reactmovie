@@ -12,6 +12,7 @@ import { endpointBe } from "../../../../utils/contant";
 import { Movie } from "../../../../types/movie";
 import { getAllMovies } from "../../../../api/movieApi";
 import { DataTable } from "../../../../utils/DataTable";
+import {text} from "node:stream/consumers";
 
 
 interface MovieTableProps {
@@ -50,38 +51,45 @@ export const MovieTable: React.FC<MovieTableProps> = (props) => {
         fetchData();
     }, [props.keyCountReload]);
 
-    // Xử lý xóa phim
-    const handleDeleteMovie = (id: number) => {
-        const token = localStorage.getItem("token");
-        confirm({
+    const handleDeleteMovie = async (id: number) => {
+        const result = await confirm({
             title: "Xóa phim",
             description: "Bạn chắc chắn muốn xóa phim này?",
             confirmationText: "Xóa",
             cancellationText: "Hủy",
-        })
-            .then(async () => {
-                try {
-                    const response = await fetch(endpointBe + `/movies/${id}`, {
-                        method: "DELETE",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
+        });
 
-                    if (response.ok) {
-                        toast.success("Xóa phim thành công");
-                        props.setKeyCountReload?.(Math.random());
-                    } else {
-                        throw new Error("Lỗi khi xóa phim");
-                    }
-                } catch (error) {
-                    console.error("Lỗi khi xóa phim:", error);
-                    toast.error("Không thể xóa phim");
-                }
-            })
-            .catch(() => {
-                // Người dùng đã hủy xóa
+        if (!result.confirmed) {
+            toast.info("Đã huỷ xóa phim");
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem("access_token");
+            if (!token) {
+                toast.error("Bạn chưa đăng nhập!");
+                return;
+            }
+
+
+            const response = await fetch(`${endpointBe}/movies/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
             });
+
+            if (!response.ok) {
+                console.error("Delete failed:", response.status);
+                throw new Error("Lỗi khi xóa phim");
+            }
+
+            toast.success("Xóa phim thành công");
+            props.setKeyCountReload?.(Math.random());
+        } catch (error) {
+            console.error("Lỗi khi xóa phim:", error);
+            toast.error("Không thể xóa phim");
+        }
     };
 
     const columns: GridColDef[] = [

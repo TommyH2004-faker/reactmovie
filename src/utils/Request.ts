@@ -10,6 +10,8 @@ export async function my_request(duongdan: string) {
     // neu tra ve ok
     return response.json();
 }
+
+
 export async function requestAdmin(endpoint: string) {
     const token = localStorage.getItem("access_token");
 

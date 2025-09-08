@@ -39,11 +39,14 @@ const AdminDashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Lấy tất cả phim, lấy trang đầu và size lớn để lấy nhiều phim nhất
-    layToanBoPhim(0)
-      .then((res) => setMovieList(res.ketQua))
-      .catch(console.log);
+    getAllMovies(0,1000)
+        .then((res) => {
+          console.log("Movie list:", res.ketQua);
+          setMovieList(res.ketQua);
+        })
+        .catch(console.log);
   }, []);
+
 
   return (
     <>
