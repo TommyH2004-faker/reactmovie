@@ -130,6 +130,13 @@ export async function addReview(review: AddReviewDto): Promise<Review | null> {
     return null;
   }
 }
+export const getReviewsByUser = async (userId: number) => {
+    const res = await fetch(endpointBe+`/reviews/byUser/${userId}`);
+    if (!res.ok) {
+        throw new Error("Không thể tải đánh giá");
+    }
+    return res.json();
+};
 
 
 

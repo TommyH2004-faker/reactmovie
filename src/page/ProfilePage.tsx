@@ -10,6 +10,9 @@ import {
   IconButton,
   InputAdornment,
 } from "@mui/material";
+
+import { Trash, Pencil } from "react-bootstrap-icons";
+
 import { EditOutlined, CloudUpload, Close, Check, Visibility, VisibilityOff } from "@mui/icons-material";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
@@ -23,6 +26,7 @@ import { useAuth } from "../utils/AuthContext";
 import { User } from "../types/user";
 import { endpointBe } from "../utils/contant";
 import HiddenInputUpload from "../utils/HiddenInputUpload";
+import renderRating from "../utils/SaoXepHang";
 
 const ProfilePage: React.FC = () => {
   useScrollToTop();
@@ -47,6 +51,7 @@ const ProfilePage: React.FC = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
 
   useEffect(() => {
     const idUser = getIdUserByToken();
@@ -276,6 +281,8 @@ const ProfilePage: React.FC = () => {
                     ))}
                   </ul>
                 </TabPanel>
+
+
                 <TabPanel value="3">
                   {/* Change password */}
                   <form onSubmit={handleChangePassword}>
