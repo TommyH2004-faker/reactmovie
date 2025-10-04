@@ -9,8 +9,9 @@ import { Genre } from "../../../../types/genre";
 import { Movie } from "../../../../types/movie";
 import { endpointBe } from "../../../../utils/contant";
 import { getAllGenres } from "../../../../api/genreApi";
-import { SelectMultiple } from "../../../../utils/SelectMultiple";
 import { layPhimById } from "../../../../api/movieApi";
+import { SelectMultiple } from "../../../../utils/SelectMultiple";
+
 
 interface MovieFormProps {
     id: number;
