@@ -33,7 +33,7 @@ export const UserForm: React.FC<UserFormProps> = (props) => {
     password: "",
     gender: "",
     enabled: true,
-    avatar_url: "",
+    avatar: "",
   });
 
   const [avatar, setAvatar] = useState<File | null>(null);
@@ -86,7 +86,7 @@ export const UserForm: React.FC<UserFormProps> = (props) => {
 
         if (!uploadRes.ok) throw new Error("Upload avatar thất bại");
         const uploadData = await uploadRes.json();
-        user.avatar_url = uploadData.avatar_url;
+        user.avatar = uploadData.avatar;
       }
 
       const endpoint =

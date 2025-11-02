@@ -1,44 +1,36 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
-
-export interface JwtPayload {
-	sub: number;
-	name: string;
-	role?: { id: number; name: string };
-	iat: number;
-	exp: number;
-	id: number;
-	avatar: string;
-	enabled: boolean;
-}
+import { useAuth } from "../utils/AuthContext";
 
 const RequireAdmin = <P extends object>(
 	WrappedComponent: React.ComponentType<P>
 ) => {
 	const WithAdminCheck: React.FC<P> = (props) => {
 		const navigate = useNavigate();
+		const { isLoggedIn, userInfo, isLoading } = useAuth();
 
 		useEffect(() => {
-			const token = localStorage.getItem("access_token");
+			if (!isLoading) {  // Chỉ kiểm tra sau khi đã load xong
+				if (!isLoggedIn || !userInfo) {
+					navigate("/dangnhap");
+					return;
+				}
 
-			if (!token) {
-				navigate("/dangnhap");
-				return;
+				if (userInfo.role !== "ADMIN") {
+					navigate("/bao-loi-403");
+					return;
+				}
 			}
+		}, [navigate, isLoggedIn, userInfo, isLoading]);
 
-			const decodedToken = jwtDecode(token) as JwtPayload;
-
-			// Lấy role từ decodedToken
-			const role = decodedToken.role;
-			if (!role || role.name !== "ADMIN") {
-				navigate("/bao-loi-403");
-			}
-		}, [navigate]);
+		// Hiển thị component chỉ khi đã load xong và người dùng là admin
+		if (isLoading || !isLoggedIn || !userInfo || userInfo.role !== "ADMIN") {
+			return null;
+		}
 
 		return <WrappedComponent {...props} />;
 	};
-	return WithAdminCheck || null;
+	return WithAdminCheck;
 };
 
 export default RequireAdmin;

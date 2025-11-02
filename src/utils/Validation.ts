@@ -45,12 +45,31 @@ export const checkExistUsername = async (setErrorUsername: any, name: string) =>
 
 // Hàm check mật khẩu có đúng định dạng không
 export const checkPassword = (setErrorPassword: any, password: string) => {
-   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
    if (password === "") {
       return false;
-   } else if (!passwordRegex.test(password)) {
+   }
+
+   let errors = [];
+   
+   if (password.length < 8) {
+      errors.push("ít nhất 8 ký tự");
+   }
+   if (!password.match(/[a-z]/)) {
+      errors.push("chữ thường");
+   }
+   if (!password.match(/[A-Z]/)) {
+      errors.push("chữ hoa");
+   }
+   if (!password.match(/[0-9]/)) {
+      errors.push("số");
+   }
+   if (!password.match(/[!@#$%^&*(),.?":{}|<>]/)) {
+      errors.push("ký tự đặc biệt");
+   }
+
+   if (errors.length > 0) {
       setErrorPassword(
-         "Mật khẩu phải có ít nhất 8 ký tự và bao gồm chữ và số."
+         `Mật khẩu phải có ${errors.join(", ")}.`
       );
       return true;
    } else {

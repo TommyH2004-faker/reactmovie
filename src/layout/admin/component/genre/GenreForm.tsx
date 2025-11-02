@@ -42,59 +42,107 @@ export const GenreForm: React.FC<GenreFormProps> = ({
     }
   }, [id, option, handleCloseModal]);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  // const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault();
 
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      toast.error("Bạn chưa đăng nhập!");
+  //   const token = localStorage.getItem("access_token");
+  //   if (!token) {
+  //     toast.error("Bạn chưa đăng nhập!");
+  //     return;
+  //   }
+
+  //   try {
+  //     const method = option === "add" ? "POST" : "PATCH";
+  //     const endpoint =
+  //       option === "add"
+  //         ? `${endpointBe}/genres`
+  //         : `${endpointBe}/genres/${id}`;
+
+  //     const payload =
+  //       option === "add"
+  //         ? {
+  //             name: genre.name,
+  //             slug: genre.slug || genre.name.toLowerCase().replace(/\s+/g, "-"),
+  //           }
+  //         : {
+  //             name: genre.name,
+  //             slug: genre.slug || genre.name.toLowerCase().replace(/\s+/g, "-"),
+  //           };
+
+  //     const response = await fetch(endpoint, {
+  //       method,
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify(payload),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Request failed");
+  //     }
+
+  //     toast.success(
+  //       option === "add" ? "Thêm thể loại thành công" : "Cập nhật thể loại thành công"
+  //     );
+
+  //     if (setKeyCountReload) {
+  //       setKeyCountReload(Math.random());
+  //     }
+  //     handleCloseModal();
+  //   } catch (error) {
+  //     toast.error("Lỗi khi thực hiện hành động");
+  //     console.error(error);
+  //   }
+  // };
+const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
+
+  try {
+    const method = option === "add" ? "POST" : "PATCH";
+    const endpoint =
+      option === "add"
+        ? `${endpointBe}/genres`
+        : `${endpointBe}/genres/${id}`;
+
+    const payload = {
+      name: genre.name,
+      slug: genre.slug || genre.name.toLowerCase().replace(/\s+/g, "-"),
+    };
+
+    const response = await fetch(endpoint, {
+      method,
+      credentials: "include", // ✅ gửi cookie HttpOnly
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.status === 401) {
+      toast.error("Phiên đăng nhập đã hết hạn hoặc chưa đăng nhập!");
       return;
     }
 
-    try {
-      const method = option === "add" ? "POST" : "PATCH";
-      const endpoint =
-        option === "add"
-          ? `${endpointBe}/genres`
-          : `${endpointBe}/genres/${id}`;
-
-      const payload =
-        option === "add"
-          ? {
-              name: genre.name,
-              slug: genre.slug || genre.name.toLowerCase().replace(/\s+/g, "-"),
-            }
-          : {
-              name: genre.name,
-              slug: genre.slug || genre.name.toLowerCase().replace(/\s+/g, "-"),
-            };
-
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error("Request failed");
-      }
-
-      toast.success(
-        option === "add" ? "Thêm thể loại thành công" : "Cập nhật thể loại thành công"
-      );
-
-      if (setKeyCountReload) {
-        setKeyCountReload(Math.random());
-      }
-      handleCloseModal();
-    } catch (error) {
-      toast.error("Lỗi khi thực hiện hành động");
-      console.error(error);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error("Lỗi response:", errorData);
+      throw new Error(errorData.message || "Request failed");
     }
-  };
+
+    toast.success(
+      option === "add"
+        ? "Thêm thể loại thành công"
+        : "Cập nhật thể loại thành công"
+    );
+
+    setKeyCountReload?.(Math.random());
+    handleCloseModal();
+  } catch (error) {
+    console.error("Lỗi khi thực hiện hành động:", error);
+    toast.error("Không thể thực hiện hành động, vui lòng thử lại!");
+  }
+};
 
   return (
     <div>

@@ -116,8 +116,19 @@ export const ForgotPassword: React.FC = () => {
           >
             Lấy lại mật khẩu
           </Button>
+          <Box mt={2} textAlign="center" color="text.secondary" fontSize="0.9rem">
+            Quay lại trang{" "}
+            <Button
+              variant="text"
+              onClick={() => navigation("/dangnhap")}
+              sx={{ textTransform: "none", fontSize: "0.9rem" }}
+            >
+              Đăng nhập
+            </Button>
+          </Box>
         </form>
       </Paper>
     </Box>
+
   );
 };

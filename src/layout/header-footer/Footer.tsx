@@ -34,16 +34,16 @@ const Footer: React.FC = () => {
                 <div className="footer-section">
                     <h4>Kết nối</h4>
                     <div className="social-icons">
-                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                        <a href="#" target="_blank" rel="noopener noreferrer">
                             {React.createElement(FaFacebookF as any)}
                         </a>
-                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                        <a href="#" target="_blank" rel="noopener noreferrer">
                             {React.createElement(FaTwitter as any)}
                         </a>
-                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                        <a href="#" target="_blank" rel="noopener noreferrer">
                             {React.createElement(FaInstagram as any)}
                         </a>
-                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                        <a href="#" target="_blank" rel="noopener noreferrer">
                             {React.createElement(FaYoutube as any)}
                         </a>
                     </div>

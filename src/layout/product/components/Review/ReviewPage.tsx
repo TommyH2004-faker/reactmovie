@@ -9,7 +9,7 @@ import {
 import { Review } from "../../../../types/review";
 import "./ReviewPage.css";
 import renderRating from "../../../../utils/SaoXepHang";
-import { getIdUserByToken } from "../../../../utils/JwtService";
+
 import { toast } from "react-toastify";
 
 // Material UI Icons
@@ -18,6 +18,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AddCommentIcon from "@mui/icons-material/AddComment";
+import { getIdUserByServer } from "../../../../utils/JwtService";
 
 const ReviewPage: React.FC = () => {
   const { movieId } = useParams<{ movieId: string }>();
@@ -25,7 +26,15 @@ const ReviewPage: React.FC = () => {
   const [newReview, setNewReview] = useState({ rating: 0, comment: "" });
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [loading, setLoading] = useState(true);
-  const userId = getIdUserByToken();
+ const [userId, setUserId] = useState<number | null>(null);
+
+useEffect(() => {
+  (async () => {
+    const id = await getIdUserByServer();
+    setUserId(id);
+  })();
+}, []);
+
 
   useEffect(() => {
     if (!movieId) return;
@@ -114,34 +123,36 @@ const ReviewPage: React.FC = () => {
       <h2>Đánh giá</h2>
 
       <ul className="review-list">
-        {reviews.map((review) => (
-          <li key={review.id} className="review-item">
-            <p className="review-user">
-              <strong>{review.user?.name || "Người dùng ẩn danh"}:</strong>
-            </p>
-            <div className="review-stars">{renderRating(review.rating)}</div>
-            <p className="review-comment">{review.comment}</p>
-            <small className="review-date">
-              {new Date(review.created_at).toLocaleString()}
-            </small>
-            {userId === review.user?.id && (
-              <div className="review-actions">
-                <button
-                  className="btn-edit"
-                  onClick={() => handleEditReview(review)}
-                >
-                  <EditIcon fontSize="small" /> Sửa
-                </button>
-                <button
-                  className="btn-delete"
-                  onClick={() => handleDeleteReview(review.id)}
-                >
-                  <DeleteIcon fontSize="small" /> Xóa
-                </button>
-              </div>
-            )}
-          </li>
-        ))}
+     {reviews.map((review) => (
+  <li key={review.id} className="review-item">
+    <p className="review-user">
+      <strong>{review.user?.name || "Người dùng ẩn danh"}:</strong>
+    </p>
+    <div className="review-stars">{renderRating(review.rating)}</div>
+    <p className="review-comment">{review.comment}</p>
+    <small className="review-date">
+      {new Date(review.created_at).toLocaleString()}
+    </small>
+
+    {userId === review.user?.id && (
+      <div className="review-actions">
+        <button
+          className="btn-edit"
+          onClick={() => handleEditReview(review)}
+        >
+          <EditIcon fontSize="small" /> Sửa
+        </button>
+        <button
+          className="btn-delete"
+          onClick={() => handleDeleteReview(review.id)}
+        >
+          <DeleteIcon fontSize="small" /> Xóa
+        </button>
+      </div>
+    )}
+  </li>
+))}
+
       </ul>
 
       {/* Form thêm/sửa review */}

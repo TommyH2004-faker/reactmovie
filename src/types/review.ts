@@ -8,13 +8,15 @@ export class Review {
   user: User;
   movie: Movie;
   created_at: Date;
+  movieTitle?: string;
 
-  constructor(id: number, rating: number, user: User, movie: Movie, created_at: Date, comment?: string) {
+  constructor(id: number, rating: number, user: User, movie: Movie, created_at: Date, comment?: string, movieTitle?: string) {
     this.id = id;
     this.rating = rating;
     this.user = user;
     this.movie = movie;
     this.created_at = created_at;
     this.comment = comment;
+    this.movieTitle = movieTitle;
   }
 }

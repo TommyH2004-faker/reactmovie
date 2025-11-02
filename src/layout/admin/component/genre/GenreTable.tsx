@@ -47,40 +47,38 @@ export const GenreTable: React.FC<GenreTableProps> = ({
   }, [keyCountReload]);
 
   // const handleDeleteGenre = async (id: number) => {
+  //   const result = await confirm({
+  //     title: "Xoá thể loại",
+  //     description: "Bạn chắc chắn xoá thể loại này chứ?",
+  //     confirmationText: "Xoá",
+  //     cancellationText: "Huỷ"
+  //   });
+
+  //   if (!result.confirmed) {
+  //     toast.info("Đã huỷ xoá thể loại");
+  //     return;
+  //   }
+
   //   try {
-  //     await confirm({
-  //       title: "Xoá thể loại",
-  //       description: "Bạn chắc chắn xoá thể loại này chứ?",
-  //       confirmationText: "Xoá",
-  //       cancellationText: "Huỷ"
-  //     });
-  //
   //     const token = localStorage.getItem("access_token");
   //     if (!token) {
   //       toast.error("Bạn chưa đăng nhập!");
   //       return;
   //     }
-  //
+
   //     const response = await fetch(`${endpointBe}/genres/${id}`, {
   //       method: 'DELETE',
   //       headers: {
   //         'Authorization': `Bearer ${token}`
   //       }
   //     });
-  //
+
   //     if (!response.ok) {
   //       throw new Error('Delete request failed');
   //     }
-  //
+
   //     toast.success("Xoá thể loại thành công");
-  //     if (setKeyCountReload) {
-  //       setKeyCountReload(Math.random());
-  //     }
-  //
-  //     toast.success("Xoá thể loại thành công");
-  //     if (setKeyCountReload) {
-  //       setKeyCountReload(Math.random());
-  //     }
+  //     setKeyCountReload?.(Math.random());
   //   } catch (error) {
   //     if (error instanceof Error) {
   //       toast.error("Lỗi khi xoá thể loại");
@@ -88,46 +86,43 @@ export const GenreTable: React.FC<GenreTableProps> = ({
   //     }
   //   }
   // };
-  const handleDeleteGenre = async (id: number) => {
-    const result = await confirm({
-      title: "Xoá thể loại",
-      description: "Bạn chắc chắn xoá thể loại này chứ?",
-      confirmationText: "Xoá",
-      cancellationText: "Huỷ"
+const handleDeleteGenre = async (id: number) => {
+  const result = await confirm({
+    title: "Xoá thể loại",
+    description: "Bạn chắc chắn xoá thể loại này chứ?",
+    confirmationText: "Xoá",
+    cancellationText: "Huỷ"
+  });
+
+  if (!result.confirmed) {
+    toast.info("Đã huỷ xoá thể loại");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${endpointBe}/genres/${id}`, {
+      method: "DELETE",
     });
 
-    if (!result.confirmed) {
-      toast.info("Đã huỷ xoá thể loại");
+    if (response.status === 401) {
+      toast.error("Phiên đăng nhập đã hết hạn hoặc chưa đăng nhập!");
       return;
     }
 
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        toast.error("Bạn chưa đăng nhập!");
-        return;
-      }
-
-      const response = await fetch(`${endpointBe}/genres/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Delete request failed');
-      }
-
-      toast.success("Xoá thể loại thành công");
-      setKeyCountReload?.(Math.random());
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error("Lỗi khi xoá thể loại");
-        console.error(error);
-      }
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error("Delete failed:", errorData);
+      toast.error(errorData.message || "Không thể xoá thể loại");
+      return;
     }
-  };
+
+    toast.success("Xoá thể loại thành công");
+    setKeyCountReload?.(Math.random());
+  } catch (error) {
+    console.error("Lỗi khi xoá thể loại:", error);
+    toast.error("Không thể xoá thể loại");
+  }
+};
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 150 },

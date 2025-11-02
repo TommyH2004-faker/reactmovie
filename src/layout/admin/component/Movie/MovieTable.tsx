@@ -51,46 +51,93 @@ export const MovieTable: React.FC<MovieTableProps> = (props) => {
         fetchData();
     }, [props.keyCountReload]);
 
+    // const handleDeleteMovie = async (id: number) => {
+    //     const result = await confirm({
+    //         title: "Xóa phim",
+    //         description: "Bạn chắc chắn muốn xóa phim này?",
+    //         confirmationText: "Xóa",
+    //         cancellationText: "Hủy",
+    //     });
+
+    //     if (!result.confirmed) {
+    //         toast.info("Đã huỷ xóa phim");
+    //         return;
+    //     }
+
+    //     try {
+    //         const token = localStorage.getItem("access_token");
+    //         if (!token) {
+    //             toast.error("Bạn chưa đăng nhập!");
+    //             return;
+    //         }
+
+
+    //         const response = await fetch(`${endpointBe}/movies/${id}`, {
+    //             method: "DELETE",
+    //             headers: {
+    //                 "Authorization": `Bearer ${token}`,
+    //             },
+    //         });
+
+    //         if (!response.ok) {
+    //             console.error("Delete failed:", response.status);
+    //             throw new Error("Lỗi khi xóa phim");
+    //         }
+
+    //         toast.success("Xóa phim thành công");
+    //         props.setKeyCountReload?.(Math.random());
+    //     } catch (error) {
+    //         console.error("Lỗi khi xóa phim:", error);
+    //         toast.error("Không thể xóa phim");
+    //     }
+    // };
     const handleDeleteMovie = async (id: number) => {
-        const result = await confirm({
-            title: "Xóa phim",
-            description: "Bạn chắc chắn muốn xóa phim này?",
-            confirmationText: "Xóa",
-            cancellationText: "Hủy",
-        });
+  const result = await confirm({
+    title: "Xóa phim",
+    description: "Bạn chắc chắn muốn xóa phim này?",
+    confirmationText: "Xóa",
+    cancellationText: "Hủy",
+  });
 
-        if (!result.confirmed) {
-            toast.info("Đã huỷ xóa phim");
-            return;
-        }
+  if (!result.confirmed) {
+    toast.info("Đã huỷ xóa phim");
+    return;
+  }
 
-        try {
-            const token = localStorage.getItem("access_token");
-            if (!token) {
-                toast.error("Bạn chưa đăng nhập!");
-                return;
-            }
+  try {
+    const response = await fetch(`${endpointBe}/movies/${id}`, {
+      method: "DELETE",
+      credentials: "include", // ✅ gửi cookie HttpOnly
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
+    // Nếu chưa đăng nhập hoặc cookie hết hạn
+    if (response.status === 401) {
+      toast.error("Phiên đăng nhập đã hết hạn hoặc chưa đăng nhập!");
+      return;
+    }
 
-            const response = await fetch(`${endpointBe}/movies/${id}`, {
-                method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                },
-            });
+    // Nếu backend trả về lỗi khác
+    if (!response.ok) {
+      const text = await response.text();
+      console.error("Delete failed:", response.status, text);
+      toast.error("Không thể xóa phim");
+      return;
+    }
 
-            if (!response.ok) {
-                console.error("Delete failed:", response.status);
-                throw new Error("Lỗi khi xóa phim");
-            }
+    // ✅ Đọc phản hồi JSON từ backend
+    const data = await response.json();
+    toast.success(data.message || "Xóa phim thành công");
 
-            toast.success("Xóa phim thành công");
-            props.setKeyCountReload?.(Math.random());
-        } catch (error) {
-            console.error("Lỗi khi xóa phim:", error);
-            toast.error("Không thể xóa phim");
-        }
-    };
+    // Reload lại bảng
+    props.setKeyCountReload?.(Math.random());
+  } catch (error) {
+    console.error("Lỗi khi xóa phim:", error);
+    toast.error("Không thể xóa phim");
+  }
+};
 
     const columns: GridColDef[] = [
         { field: "id", headerName: "ID", width: 70 },

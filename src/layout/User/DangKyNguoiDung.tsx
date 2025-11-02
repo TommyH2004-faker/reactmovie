@@ -265,6 +265,46 @@ const DangKyNguoiDung: React.FC = () => {
   const [repeatPassword, setRepeatPassword] = useState("");
   const [email, setEmail] = useState("");
   const [gender, setGender] = useState("M");
+  const [passwordStrength, setPasswordStrength] = useState(0); // 0-4 cho độ mạnh mật khẩu
+
+  // Hàm đánh giá độ mạnh của mật khẩu
+  const calculatePasswordStrength = (pass: string) => {
+    let strength = 0;
+    
+    if (pass.length >= 8) strength += 1;
+    if (pass.match(/[a-z]+/)) strength += 1;
+    if (pass.match(/[A-Z]+/)) strength += 1;
+    if (pass.match(/[0-9]+/)) strength += 1;
+    if (pass.match(/[!@#$%^&*(),.?":{}|<>]+/)) strength += 1;
+    
+    return strength;
+  };
+
+  // Trả về màu dựa trên độ mạnh
+  const getPasswordStrengthColor = (strength: number) => {
+    switch (strength) {
+      case 0: return "error.main";
+      case 1: return "error.main";
+      case 2: return "warning.main";
+      case 3: return "info.main";
+      case 4:
+      case 5: return "success.main";
+      default: return "error.main";
+    }
+  };
+
+  // Trả về text mô tả độ mạnh
+  const getPasswordStrengthText = (strength: number) => {
+    switch (strength) {
+      case 0: return "Rất yếu";
+      case 1: return "Yếu";
+      case 2: return "Trung bình";
+      case 3: return "Khá mạnh";
+      case 4:
+      case 5: return "Mạnh";
+      default: return "Rất yếu";
+    }
+  };
 
   // Hiện/ẩn mật khẩu
   const [showPassword, setShowPassword] = useState(false);
@@ -279,62 +319,119 @@ const DangKyNguoiDung: React.FC = () => {
   // Button loading
   const [statusBtn, setStatusBtn] = useState(false);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setStatusBtn(true);
+  // const handleSubmit = async (event: React.FormEvent) => {
+  //   event.preventDefault();
+  //   setStatusBtn(true);
 
-    setErrorName("");
-    setErrorEmail("");
-    setErrorPassword("");
-    setErrorRepeatPassword("");
+  //   setErrorName("");
+  //   setErrorEmail("");
+  //   setErrorPassword("");
+  //   setErrorRepeatPassword("");
 
-    const isNameValid = !(await checkExistUsername(setErrorName, name));
-    const isEmailValid = !(await checkExistEmail(setErrorEmail, email));
-    const isPassword = !checkPassword(setErrorPassword, password);
-    const isRepeatPassword = !checkRepeatPassword(
-      setErrorRepeatPassword,
-      repeatPassword,
-      password
-    );
+  //   const isNameValid = !(await checkExistUsername(setErrorName, name));
+  //   const isEmailValid = !(await checkExistEmail(setErrorEmail, email));
+  //   const isPassword = !checkPassword(setErrorPassword, password);
+  //   const isRepeatPassword = !checkRepeatPassword(
+  //     setErrorRepeatPassword,
+  //     repeatPassword,
+  //     password
+  //   );
 
-    if (isNameValid && isEmailValid && isPassword && isRepeatPassword) {
-      try {
-        const endpoint = endpointBe + "/auth/register";
+  //   if (isNameValid && isEmailValid && isPassword && isRepeatPassword) {
+  //     try {
+  //       const endpoint = endpointBe + "/auth/register";
 
-        const response = await toast.promise(
-          fetch(endpoint, {
-            method: "POST",
-            headers: {
-              "Content-type": "application/json",
-            },
-            body: JSON.stringify({
-              name,
-              password,
-              email,
-              gender,
-            }),
+  //       const response = await toast.promise(
+  //         fetch(endpoint, {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-type": "application/json",
+  //           },
+  //           body: JSON.stringify({
+  //             name,
+  //             password,
+  //             email,
+  //             gender,
+  //           }),
+  //         }),
+  //         { pending: "Đang trong quá trình xử lý ..." }
+  //       );
+
+  //       if (response.ok) {
+  //         toast.success("Đăng ký tài khoản thành công.");
+  //         navigation("/dangnhap");
+  //       } else {
+  //         const err = await response.json();
+  //         toast.error(err.message || "Đăng ký tài khoản thất bại");
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //       toast.error("Đăng ký tài khoản thất bại");
+  //     } finally {
+  //       setStatusBtn(false);
+  //     }
+  //   } else {
+  //     setStatusBtn(false);
+  //   }
+  // };
+const handleSubmit = async (event: React.FormEvent) => {
+  event.preventDefault();
+  setStatusBtn(true);
+
+  setErrorName("");
+  setErrorEmail("");
+  setErrorPassword("");
+  setErrorRepeatPassword("");
+
+  const isNameValid = !(await checkExistUsername(setErrorName, name));
+  const isEmailValid = !(await checkExistEmail(setErrorEmail, email));
+  const isPassword = !checkPassword(setErrorPassword, password);
+  const isRepeatPassword = !checkRepeatPassword(
+    setErrorRepeatPassword,
+    repeatPassword,
+    password
+  );
+
+  if (isNameValid && isEmailValid && isPassword && isRepeatPassword) {
+    try {
+      const endpoint = endpointBe + "/auth/register";
+
+      const response = await toast.promise(
+        fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            name, // Đổi name thành username nếu backend expect username
+            password,
+            email,
+            gender,
           }),
-          { pending: "Đang trong quá trình xử lý ..." }
-        );
+        }),
+        { pending: "Đang trong quá trình xử lý ..." }
+      );
 
-        if (response.ok) {
-          toast.success("Đăng ký tài khoản thành công.");
-          navigation("/dangnhap");
-        } else {
-          const err = await response.json();
-          toast.error(err.message || "Đăng ký tài khoản thất bại");
-        }
-      } catch (error) {
-        console.log(error);
-        toast.error("Đăng ký tài khoản thất bại");
-      } finally {
-        setStatusBtn(false);
+      if (response.ok) {
+        const result = await response.json();
+        toast.success(
+          "Đăng ký tài khoản thành công. Vui lòng kiểm tra email để kích hoạt tài khoản."
+        );
+        navigation("/dangnhap");
+      } else {
+        const err = await response.json();
+        toast.error(err.message || "Đăng ký tài khoản thất bại");
       }
-    } else {
+    } catch (error) {
+      console.error("Lỗi đăng ký:", error);
+      toast.error("Đăng ký tài khoản thất bại");
+    } finally {
       setStatusBtn(false);
     }
-  };
-
+  } else {
+    setStatusBtn(false);
+  }
+};
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
       <Paper
@@ -360,12 +457,12 @@ const DangKyNguoiDung: React.FC = () => {
               error={errorName.length > 0}
               helperText={errorName}
               required
-              label="Tên đăng nhập"
+              label="Tên người dùng "
               placeholder="Nhập tên đăng nhập"
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
-                if (errorName) setErrorName(""); // xoá báo đỏ khi nhập lại
+                if (errorName) setErrorName("");
               }}
               onBlur={(e) => checkExistUsername(setErrorName, e.target.value)}
               sx={{ mb: 2 }}
@@ -388,31 +485,68 @@ const DangKyNguoiDung: React.FC = () => {
               sx={{ mb: 2 }}
             />
 
-            <TextField
-              fullWidth
-              error={errorPassword.length > 0}
-              helperText={errorPassword}
-              required
-              type={showPassword ? "text" : "password"}
-              label="Mật khẩu"
-              placeholder="Nhập mật khẩu"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (errorPassword) setErrorPassword("");
-              }}
-              onBlur={(e) => checkPassword(setErrorPassword, e.target.value)}
-              sx={{ mb: 2 }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword((prev) => !prev)}>
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
+            <Box sx={{ width: '100%', mb: 2 }}>
+              <TextField
+                fullWidth
+                error={errorPassword.length > 0}
+                required
+                type={showPassword ? "text" : "password"}
+                label="Mật khẩu"
+                placeholder="Nhập mật khẩu (tối thiểu 8 ký tự)"
+                value={password}
+                onChange={(e) => {
+                  const newPassword = e.target.value;
+                  setPassword(newPassword);
+                  setPasswordStrength(calculatePasswordStrength(newPassword));
+                  if (errorPassword) setErrorPassword("");
+                }}
+                onBlur={(e) => checkPassword(setErrorPassword, e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowPassword((prev) => !prev)}>
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              {password && (
+                <Box sx={{ mt: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {[0, 1, 2, 3, 4].map((index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          height: 4,
+                          flex: 1,
+                          bgcolor: index < passwordStrength 
+                            ? getPasswordStrengthColor(passwordStrength)
+                            : 'grey.300',
+                          transition: 'background-color 0.3s',
+                          borderRadius: 1
+                        }}
+                      />
+                    ))}
+                  </Box>
+                  <Typography 
+                    variant="caption" 
+                    sx={{ 
+                      color: getPasswordStrengthColor(passwordStrength),
+                      mt: 0.5,
+                      display: 'block'
+                    }}
+                  >
+                    {getPasswordStrengthText(passwordStrength)}
+                  </Typography>
+                  {errorPassword && (
+                    <Typography variant="caption" color="error.main" sx={{ mt: 0.5, display: 'block' }}>
+                      {errorPassword}
+                    </Typography>
+                  )}
+                </Box>
+              )}
+            </Box>
 
             <TextField
               fullWidth
