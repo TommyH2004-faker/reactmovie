@@ -190,6 +190,119 @@
 //     role: Array.isArray(profile.roles) ? profile.roles[0] : profile.role,
 //   };
 // }
+
+
+
+
+
+
+
+
+
+// import axios from "axios";
+// import { NavigateFunction } from "react-router-dom";
+// import { endpointBe } from "./contant";
+
+// // ⚙️ Cấu hình axios gửi kèm cookie trong mọi request
+// axios.defaults.withCredentials = true;
+
+
+
+// export function hasAuthCookie(): boolean {
+//   // HttpOnly cookies cannot be reliably read from JavaScript (document.cookie).
+//   // If the server sets HttpOnly cookies for auth, checking document.cookie will incorrectly
+//   // report "no cookie" even when the browser sends the cookie on requests.
+//   //
+//   // Therefore, be optimistic here and let the server decide by calling /auth/profile.
+//   // Returning true causes callers to attempt a server-side profile check which will
+//   // return 200 (authenticated) or 401 (not authenticated).
+//   return true;
+// }
+
+
+// export async function getProfileFromServer() {
+//   if (!hasAuthCookie()) {
+//     return null;
+//   }
+
+//   try {
+//     const res = await axios.get(`${endpointBe}/auth/profile`, {
+//       withCredentials: true,
+//       validateStatus: () => true, 
+//     });
+
+//     if (res.status === 401) {
+//       return null;
+//     }
+//     if (res.status === 200 && res.data) {
+//       return res.data;
+//     }
+
+//     console.warn("⚠️ Không lấy được profile:", res.status, res.data);
+//     return null;
+//   } catch (err) {
+//     console.error("❌ Lỗi khi lấy profile:", err);
+//     return null;
+//   }
+// }
+
+
+// export async function isAuthenticated(): Promise<boolean> {
+//   const profile = await getProfileFromServer();
+//   return !!profile;
+// }
+
+// /**
+//  * Các hàm phụ trợ lấy thông tin user (chỉ gọi server khi có cookie)
+//  */
+// export async function getUserNameByServer(): Promise<string | null> {
+//   const profile = await getProfileFromServer();
+//   return profile?.username || profile?.name || null;
+// }
+
+// export async function getRoleByServer(): Promise<string | null> {
+//   const profile = await getProfileFromServer();
+//   if (!profile) return null;
+//   if (Array.isArray(profile.roles)) return profile.roles[0];
+//   return profile.role || null;
+// }
+
+// export async function getAvatarByServer(): Promise<string | null> {
+//   const profile = await getProfileFromServer();
+//   return profile?.avatar || null;
+// }
+
+// export async function getIdUserByServer(): Promise<number | null> {
+//   const profile = await getProfileFromServer();
+//   return profile?.id || null;
+// }
+
+// /**
+//  * Đăng xuất — gọi API xóa cookie và điều hướng về trang đăng nhập
+//  */
+// export async function logout(navigate?: NavigateFunction) {
+//   try {
+//     await axios.post(`${endpointBe}/auth/logout`, {}, { withCredentials: true });
+//   } catch (err) {
+//     console.error(" Lỗi khi đăng xuất:", err);
+//   }
+
+//   if (navigate) navigate("/dangnhap");
+// }
+
+// /**
+//  * Lấy thông tin cơ bản của user (username + role)
+//  */
+// export async function getUserInfo(): Promise<{ username: string; role: string } | null> {
+//   const profile = await getProfileFromServer();
+//   if (!profile) return null;
+//   return {
+//     username: profile.username,
+//     role: Array.isArray(profile.roles) ? profile.roles[0] : profile.role || "USER",
+//   };
+// }
+
+
 import axios from "axios";
 import { NavigateFunction } from "react-router-dom";
 import { endpointBe } from "./contant";
@@ -197,54 +310,63 @@ import { endpointBe } from "./contant";
 // ⚙️ Cấu hình axios gửi kèm cookie trong mọi request
 axios.defaults.withCredentials = true;
 
+// 🌟 Cache profile và promise để tránh spam
+let cachedProfile: any | null | undefined = undefined;
+let profilePromise: Promise<any> | null = null;
 
-
+/**
+ * Kiểm tra cookie auth — với HttpOnly cookie, luôn optimistic
+ */
 export function hasAuthCookie(): boolean {
-  // HttpOnly cookies cannot be reliably read from JavaScript (document.cookie).
-  // If the server sets HttpOnly cookies for auth, checking document.cookie will incorrectly
-  // report "no cookie" even when the browser sends the cookie on requests.
-  //
-  // Therefore, be optimistic here and let the server decide by calling /auth/profile.
-  // Returning true causes callers to attempt a server-side profile check which will
-  // return 200 (authenticated) or 401 (not authenticated).
-  return true;
+  // Nếu bạn có cookie không HttpOnly, có thể check document.cookie
+  return true; 
 }
 
-
+/**
+ * Lấy profile từ server, cache để tránh spam
+ */
 export async function getProfileFromServer() {
-  if (!hasAuthCookie()) {
-    return null;
+  if (cachedProfile !== undefined) {
+    return cachedProfile;
+  }
+  if (profilePromise) {
+    return profilePromise;
   }
 
-  try {
-    const res = await axios.get(`${endpointBe}/auth/profile`, {
+  profilePromise = axios
+    .get(`${endpointBe}/auth/profile`, {
       withCredentials: true,
-      validateStatus: () => true, 
+      validateStatus: () => true,
+    })
+    .then((res) => {
+      if (res.status === 200 && res.data) {
+        cachedProfile = res.data;
+      } else {
+        cachedProfile = null;
+      }
+      profilePromise = null;
+      return cachedProfile;
+    })
+    .catch((err) => {
+      console.error("❌ Lỗi khi lấy profile:", err);
+      cachedProfile = null;
+      profilePromise = null;
+      return null;
     });
 
-    if (res.status === 401) {
-      return null;
-    }
-    if (res.status === 200 && res.data) {
-      return res.data;
-    }
-
-    console.warn("⚠️ Không lấy được profile:", res.status, res.data);
-    return null;
-  } catch (err) {
-    console.error("❌ Lỗi khi lấy profile:", err);
-    return null;
-  }
+  return profilePromise;
 }
 
-
+/**
+ * Kiểm tra đã login chưa
+ */
 export async function isAuthenticated(): Promise<boolean> {
   const profile = await getProfileFromServer();
   return !!profile;
 }
 
 /**
- * Các hàm phụ trợ lấy thông tin user (chỉ gọi server khi có cookie)
+ * Các hàm phụ trợ lấy thông tin user
  */
 export async function getUserNameByServer(): Promise<string | null> {
   const profile = await getProfileFromServer();
@@ -269,13 +391,14 @@ export async function getIdUserByServer(): Promise<number | null> {
 }
 
 /**
- * Đăng xuất — gọi API xóa cookie và điều hướng về trang đăng nhập
+ * Đăng xuất — xóa cookie và điều hướng
  */
 export async function logout(navigate?: NavigateFunction) {
   try {
     await axios.post(`${endpointBe}/auth/logout`, {}, { withCredentials: true });
+    cachedProfile = null; // reset cache khi logout
   } catch (err) {
-    console.error(" Lỗi khi đăng xuất:", err);
+    console.error("❌ Lỗi khi đăng xuất:", err);
   }
 
   if (navigate) navigate("/dangnhap");
