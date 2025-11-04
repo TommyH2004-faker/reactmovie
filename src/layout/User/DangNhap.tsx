@@ -239,7 +239,7 @@ const DangNhap: React.FC = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  //  Nếu đã đăng nhập, tự điều hướng đúng role
+  // 🔹 Nếu đã đăng nhập, tự điều hướng đúng role
   useEffect(() => {
     if (isLoggedIn && userInfo) {
       if (userInfo.role === "ADMIN") {
@@ -250,6 +250,8 @@ const DangNhap: React.FC = () => {
     }
   }, [isLoggedIn, userInfo, navigate]);
 
+  // 🔹 Gửi request login
+// 🔹 Gửi request login
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setError("");
@@ -296,7 +298,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 }
 
 
-    //  Nếu đăng nhập thành công thì gọi lấy profile
+    // ✅ Nếu đăng nhập thành công thì gọi lấy profile
     const profileRes = await fetch(`${endpointBe}/auth/profile`, {
       credentials: "include",
     });
@@ -322,7 +324,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       navigate("/");
     }
   } catch (err) {
-    console.error(" Lỗi đăng nhập:", err);
+    console.error("❌ Lỗi đăng nhập:", err);
     toast.error("Có lỗi xảy ra khi đăng nhập, vui lòng thử lại!");
     setError("Tài khoản hoặc mật khẩu không đúng");
   }

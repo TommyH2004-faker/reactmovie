@@ -400,11 +400,12 @@ import { useAuth } from "../utils/AuthContext";
 import { User } from "../types/user";
 import { endpointBe } from "../utils/contant";
 import HiddenInputUpload from "../utils/HiddenInputUpload";
+import { getIdUserByServer } from "../utils/JwtService";
 import { deleteReview, updateReview } from "../api/ReviewApi";
 
 const ProfilePage: React.FC = () => {
   useScrollToTop();
-  const { isLoggedIn, userInfo, setUserInfo } = useAuth();
+  const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
   useLayoutEffect(() => {
@@ -421,30 +422,29 @@ const ProfilePage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const { userInfo, setUserInfo } = useAuth();
  useEffect(() => {
   const fetchUser = async () => {
     try {
-      // Sử dụng userInfo từ AuthContext thay vì getIdUserByServer
-      if (!userInfo?.id) return;
+      const idUser = await getIdUserByServer(); // cần await
+      if (!idUser) return;
 
-      const res = await fetch(`${endpointBe}/users/${userInfo.id}`, {
+      const res = await fetch(`${endpointBe}/users/${idUser}`, {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Lỗi tải dữ liệu người dùng");
 
       const data = await res.json();
       setUser(data);
-      setPreviewAvatar(data.avatar || "");
+      setPreviewAvatar(data.avatar|| "");
     } catch (err) {
       toast.error("Không tải được dữ liệu người dùng");
       console.error(err);
     }
   };
 
-  if (isLoggedIn && userInfo?.id) {
-    fetchUser();
-  }
-}, [isLoggedIn, userInfo?.id]);
+  fetchUser();
+}, []);
 
 const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
   const file = e.target.files?.[0];

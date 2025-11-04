@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import {Link, useNavigate, useParams } from "react-router-dom";
 import { layPhimById } from "../../api/movieApi";
-import { addFavorite } from "../../api/favoritesApi";
 import { Movie } from "../../types/movie";
 import SaoXepHang from "../../utils/SaoXepHang";
 import DinhDangSo from "../../utils/dinhDangSo";
@@ -12,17 +11,15 @@ import { toast } from "react-toastify";
 import { endpointBe } from "../../utils/contant";
 import ReviewPage from "./components/Review/ReviewPage";
 import useScrollToTop from "../../hooks/ScrollToTop";
-import { useAuth } from "../../utils/AuthContext";
+import { getIdUserByServer, isAuthenticated } from "../../utils/JwtService";
 
 const MovieDetail: React.FC = () => {
     useScrollToTop();
     const { movieId } = useParams();
     const navigate = useNavigate();
-    const { isLoggedIn, userInfo } = useAuth();
     const [isFavoriteMovie, setIsFavoriteMovie] = useState(false);
     const [movie, setMovie] = useState<Movie | null>(null);
     const [loading, setLoading] = useState(true);
-    const [favoriteLoading, setFavoriteLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -47,14 +44,13 @@ const MovieDetail: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
 useEffect(() => {
   const checkFavoriteStatus = async () => {
-    console.log("🔍 checkFavoriteStatus - movie:", movie?.id);
-    console.log("🔍 checkFavoriteStatus - isLoggedIn:", isLoggedIn); 
-    console.log("🔍 checkFavoriteStatus - userInfo:", userInfo);
-    
-    if (!movie || !isLoggedIn || !userInfo?.id) return;
+    if (!movie) return;
 
     try {
-      const res = await fetch(`${endpointBe}/favorites/get-favorite-movie/${userInfo.id}`, {
+      const userId = await getIdUserByServer(); // ✅ thêm await ở đây
+      if (!userId) return;
+
+      const res = await fetch(`${endpointBe}/favorites/get-favorite-movie/${userId}`, {
         credentials: "include",
       });
 
@@ -74,54 +70,48 @@ useEffect(() => {
   };
 
   checkFavoriteStatus();
-}, [movie, isLoggedIn, userInfo]);
+}, [movie]);
 
 
 const handleFavoriteMovie = async () => {
-  // Debug thông tin user
-  console.log("🔍 Debug - isLoggedIn:", isLoggedIn);
-  console.log("🔍 Debug - userInfo:", userInfo);
-  
   // Kiểm tra đăng nhập trước khi thực hiện
-  if (!isLoggedIn) {
+  const loggedIn = await isAuthenticated();
+  if (!loggedIn) {
     toast.info("Bạn cần đăng nhập để thực hiện chức năng này");
     navigate("/dangnhap");
     return;
   }
 
-  if (!movie) {
-    toast.error("Không tìm thấy thông tin phim");
-    return;
-  }
-
-  setFavoriteLoading(true);
+  setLoading(true);
 
   try {
-    if (isFavoriteMovie) {
-      // Xóa khỏi yêu thích
-      const response = await fetch(`${endpointBe}/favorites/remove/${movie.id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+    const url = isFavoriteMovie
+      ? `${endpointBe}/favorites/remove/${movie?.id}`
+      : `${endpointBe}/favorites/add`;
 
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result?.message || "Không thể xóa khỏi yêu thích");
-      }
+    const response = await fetch(url, {
+      method: isFavoriteMovie ? "DELETE" : "POST",
+      credentials: "include", // ✅ gửi cookie HttpOnly
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: isFavoriteMovie ? undefined : JSON.stringify({ movieId: movie?.id }),
+    });
 
-      setIsFavoriteMovie(false);
-      toast.success("Đã xóa khỏi danh sách yêu thích");
-    } else {
-      // Thêm vào yêu thích
-      await addFavorite(Number(movie.id));
-      setIsFavoriteMovie(true);
-      toast.success("Đã thêm vào danh sách yêu thích");
-    }
-  } catch (err: any) {
-    console.error("❌ Lỗi khi cập nhật yêu thích:", err);
-    toast.error(err.message || "Không thể cập nhật danh sách yêu thích");
+    const result = await response.json();
+    if (!response.ok) throw new Error(result?.message || "Thao tác thất bại");
+
+    setIsFavoriteMovie(!isFavoriteMovie);
+    toast.success(
+      isFavoriteMovie
+        ? "Đã xóa khỏi danh sách yêu thích"
+        : "Đã thêm vào danh sách yêu thích"
+    );
+  } catch (err) {
+    console.error("❌ Không thể cập nhật danh sách yêu thích:", err);
+    toast.error("Không thể cập nhật danh sách yêu thích");
   } finally {
-    setFavoriteLoading(false);
+    setLoading(false);
   }
 };
 
@@ -193,13 +183,9 @@ const handleFavoriteMovie = async () => {
                             <button
                                 className={`btn btn-sm ${isFavoriteMovie ? "btn-danger" : "btn-outline-secondary"}`}
                                 onClick={handleFavoriteMovie}
-                                disabled={favoriteLoading}
                             >
                                 <i className={`fas fa-heart ${isFavoriteMovie ? "" : "text-muted"}`}></i>
-                                {favoriteLoading 
-                                    ? " Đang xử lý..." 
-                                    : (isFavoriteMovie ? " Bỏ yêu thích" : " Yêu thích")
-                                }
+                                {isFavoriteMovie ? " Bỏ yêu thích" : " Yêu thích"}
                             </button>
                         </div>
                     </div>

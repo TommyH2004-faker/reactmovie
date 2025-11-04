@@ -163,6 +163,137 @@
 //   return context;
 // };
 
+// import React, { createContext, useContext, useState, useEffect } from "react";
+// import { endpointBe } from "./contant";
+
+// // 🧩 Kiểu props cho Provider
+// interface AuthContextProps {
+//   children: React.ReactNode;
+// }
+
+// // 🧠 Kiểu thông tin người dùng
+// interface UserInfo {
+//   id?: number;
+//   username: string;
+//   email?: string;
+//   role: string;
+//   avatar?: string;
+// }
+
+// // 🧱 Kiểu cho context
+// interface AuthContextType {
+//   isLoggedIn: boolean;
+//   userInfo: UserInfo | null;
+//   setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+//   setUserInfo: React.Dispatch<React.SetStateAction<UserInfo | null>>;
+//   isLoading: boolean;
+//   logout: () => Promise<void>;
+// }
+
+// // Tạo context
+// const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// // 🧰 Hàm kiểm tra cookie (tránh gọi API thừa)
+// const hasAuthCookie = (): boolean => {
+//   return (
+//     document.cookie.includes("Authentication=") ||
+//     document.cookie.includes("access_token=")
+//   );
+// };
+
+// // ✅ Provider chính
+// export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
+//   const [isLoggedIn, setLoggedIn] = useState(false);
+//   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+//   const [isLoading, setIsLoading] = useState(true);
+
+//   // 🧭 Hàm lấy profile từ server
+//   const fetchProfile = async () => {
+//     // Nếu không có cookie thì không cần gọi API
+//     if (!hasAuthCookie()) {
+//       setLoggedIn(false);
+//       setUserInfo(null);
+//       setIsLoading(false);
+//       return;
+//     }
+
+//     try {
+//       const res = await fetch(`${endpointBe}/auth/profile`, {
+//         credentials: "include",
+//       });
+
+//       if (res.ok) {
+//         const data = await res.json();
+//         setLoggedIn(true);
+//         setUserInfo({
+//           id: data.id,
+//           username: data.username || data.email,
+//           email: data.email,
+//           role: data.roles?.[0] || data.role || "USER",
+//           avatar: data.avatar,
+//         });
+//       } else if (res.status === 401) {
+//         // ⚠️ Không cần log mỗi lần 401 nữa
+//         setLoggedIn(false);
+//         setUserInfo(null);
+//       } else {
+//         console.warn("⚠️ Không lấy được profile:", res.status);
+//         setLoggedIn(false);
+//         setUserInfo(null);
+//       }
+//     } catch (err) {
+//       console.error("❌ Lỗi khi gọi /auth/profile:", err);
+//       setLoggedIn(false);
+//       setUserInfo(null);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   // 🧩 Gọi khi app khởi động
+//   useEffect(() => {
+//     fetchProfile();
+//   }, []);
+
+//   // 🚪 Hàm đăng xuất
+//   const logout = async () => {
+//     try {
+//       await fetch(`${endpointBe}/auth/logout`, {
+//         method: "POST",
+//         credentials: "include",
+//       });
+//     } catch (err) {
+//       console.error("❌ Lỗi khi logout:", err);
+//     } finally {
+//       setLoggedIn(false);
+//       setUserInfo(null);
+//     }
+//   };
+
+//   return (
+//     <AuthContext.Provider
+//       value={{
+//         isLoggedIn,
+//         userInfo,
+//         setLoggedIn,
+//         setUserInfo,
+//         isLoading,
+//         logout,
+//       }}
+//     >
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// };
+
+// // 🪄 Hook dùng để truy cập AuthContext
+// export const useAuth = (): AuthContextType => {
+//   const context = useContext(AuthContext);
+//   if (!context) {
+//     throw new Error("useAuth phải được dùng trong AuthProvider");
+//   }
+//   return context;
+// };
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { endpointBe } from "./contant";
 
@@ -193,7 +324,7 @@ interface AuthContextType {
 // Tạo context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// 🧰 Hàm kiểm tra cookie (tránh gọi API thừa)
+// 🧰 Kiểm tra cookie auth (để tránh gọi API thừa)
 const hasAuthCookie = (): boolean => {
   return (
     document.cookie.includes("Authentication=") ||
@@ -209,7 +340,7 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
 
   // 🧭 Hàm lấy profile từ server
   const fetchProfile = async () => {
-    // Nếu không có cookie thì không cần gọi API
+    // ⚡ Nếu không có cookie -> không gọi API, không log lỗi
     if (!hasAuthCookie()) {
       setLoggedIn(false);
       setUserInfo(null);
@@ -233,7 +364,7 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
           avatar: data.avatar,
         });
       } else if (res.status === 401) {
-        // ⚠️ Không cần log mỗi lần 401 nữa
+        // ✅ Không log 401 (tránh console bị spam)
         setLoggedIn(false);
         setUserInfo(null);
       } else {
@@ -242,7 +373,8 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
         setUserInfo(null);
       }
     } catch (err) {
-      console.error("❌ Lỗi khi gọi /auth/profile:", err);
+      // ⚠️ Chỉ log lỗi mạng thực sự (không phải 401)
+      console.error("❌ Lỗi mạng khi gọi /auth/profile:", err);
       setLoggedIn(false);
       setUserInfo(null);
     } finally {
@@ -255,7 +387,7 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
     fetchProfile();
   }, []);
 
-  // 🚪 Hàm đăng xuất
+  // 🚪 Đăng xuất
   const logout = async () => {
     try {
       await fetch(`${endpointBe}/auth/logout`, {
@@ -294,135 +426,3 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
-// import React, { createContext, useContext, useState, useEffect } from "react";
-// import { endpointBe } from "./contant";
-
-// // 🧩 Kiểu props cho Provider
-// interface AuthContextProps {
-//   children: React.ReactNode;
-// }
-
-// // 🧠 Kiểu thông tin người dùng
-// interface UserInfo {
-//   id?: number;
-//   username: string;
-//   email?: string;
-//   role: string;
-//   avatar?: string;
-// }
-
-// // 🧱 Kiểu cho context
-// interface AuthContextType {
-//   isLoggedIn: boolean;
-//   userInfo: UserInfo | null;
-//   setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
-//   setUserInfo: React.Dispatch<React.SetStateAction<UserInfo | null>>;
-//   isLoading: boolean;
-//   logout: () => Promise<void>;
-// }
-
-// // Tạo context
-// const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// //  Kiểm tra cookie auth (để tránh gọi API thừa)
-// const hasAuthCookie = (): boolean => {
-//   return (
-//     document.cookie.includes("Authentication=") ||
-//     document.cookie.includes("access_token=")
-//   );
-// };
-
-// //  Provider chính
-// export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
-//   const [isLoggedIn, setLoggedIn] = useState(false);
-//   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-//   const [isLoading, setIsLoading] = useState(true);
-
-//   //  Hàm lấy profile từ server
-//   const fetchProfile = async () => {
-//     //  Nếu không có cookie -> không gọi API, không log lỗi
-//     if (!hasAuthCookie()) {
-//       setLoggedIn(false);
-//       setUserInfo(null);
-//       setIsLoading(false);
-//       return;
-//     }
-
-//     try {
-//       const res = await fetch(`${endpointBe}/auth/profile`, {
-//         credentials: "include",
-//       });
-
-//       if (res.ok) {
-//         const data = await res.json();
-//         setLoggedIn(true);
-//         setUserInfo({
-//           id: data.id,
-//           username: data.username || data.email,
-//           email: data.email,
-//           role: data.roles?.[0] || data.role || "USER",
-//           avatar: data.avatar,
-//         });
-//       } else if (res.status === 401) {
-//         //  Không log 401 (tránh console bị spam)
-//         setLoggedIn(false);
-//         setUserInfo(null);
-//       } else {
-//         console.warn("⚠️ Không lấy được profile:", res.status);
-//         setLoggedIn(false);
-//         setUserInfo(null);
-//       }
-//     } catch (err) {
-//       //  Chỉ log lỗi mạng thực sự (không phải 401)
-//       console.error(" Lỗi mạng khi gọi /auth/profile:", err);
-//       setLoggedIn(false);
-//       setUserInfo(null);
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   //  Gọi khi app khởi động
-//   useEffect(() => {
-//     fetchProfile();
-//   }, []);
-
-//   //  Đăng xuất
-//   const logout = async () => {
-//     try {
-//       await fetch(`${endpointBe}/auth/logout`, {
-//         method: "POST",
-//         credentials: "include",
-//       });
-//     } catch (err) {
-//       console.error(" Lỗi khi logout:", err);
-//     } finally {
-//       setLoggedIn(false);
-//       setUserInfo(null);
-//     }
-//   };
-
-//   return (
-//     <AuthContext.Provider
-//       value={{
-//         isLoggedIn,
-//         userInfo,
-//         setLoggedIn,
-//         setUserInfo,
-//         isLoading,
-//         logout,
-//       }}
-//     >
-//       {children}
-//     </AuthContext.Provider>
-//   );
-// };
-
-// //  Hook dùng để truy cập AuthContext
-// export const useAuth = (): AuthContextType => {
-//   const context = useContext(AuthContext);
-//   if (!context) {
-//     throw new Error("useAuth phải được dùng trong AuthProvider");
-//   }
-//   return context;
-// };

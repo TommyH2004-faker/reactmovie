@@ -14,25 +14,23 @@ export async function getFavorites(): Promise<any[]> {
 }
 
 // Add a movie to favorites
-export async function addFavorite(movieId: number): Promise<any | null> {
-    const url = `${endpointBe}/favorites/add`;
+export async function addFavorite(movieId: number, userId: number): Promise<any | null> {
+    const url = `${endpointBe}/favorites`;
     try {
         const response = await fetch(url, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            credentials: "include", // Gửi cookie authentication
-            body: JSON.stringify({ movieId }),
+            body: JSON.stringify({ movieId, userId }),
         });
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         return await response.json();
     } catch (error) {
         console.error("Error adding favorite:", error);
-        throw error; // Re-throw để component có thể handle
+        return null;
     }
 }
 
@@ -42,7 +40,6 @@ export async function deleteFavorite(favoriteId: number): Promise<boolean> {
     try {
         const response = await fetch(url, {
             method: "DELETE",
-            credentials: "include", // Gửi cookie authentication
         });
         return response.ok;
     } catch (error) {
