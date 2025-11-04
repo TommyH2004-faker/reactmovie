@@ -14,8 +14,8 @@ export async function getFavorites(): Promise<any[]> {
 }
 
 // Add a movie to favorites
-export async function addFavorite(movieId: number, userId: number): Promise<any | null> {
-    const url = `${endpointBe}/favorites`;
+export async function addFavorite(movieId: number): Promise<any | null> {
+    const url = `${endpointBe}/favorites/add`;
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -23,15 +23,16 @@ export async function addFavorite(movieId: number, userId: number): Promise<any 
                 "Content-Type": "application/json",
             },
             credentials: "include", // Gửi cookie authentication
-            body: JSON.stringify({ movieId, userId }),
+            body: JSON.stringify({ movieId }),
         });
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
         }
         return await response.json();
     } catch (error) {
         console.error("Error adding favorite:", error);
-        return null;
+        throw error; // Re-throw để component có thể handle
     }
 }
 

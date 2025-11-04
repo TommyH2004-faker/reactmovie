@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import {Link, useNavigate, useParams } from "react-router-dom";
 import { layPhimById } from "../../api/movieApi";
+import { addFavorite } from "../../api/favoritesApi";
 import { Movie } from "../../types/movie";
 import SaoXepHang from "../../utils/SaoXepHang";
 import DinhDangSo from "../../utils/dinhDangSo";
@@ -20,6 +21,7 @@ const MovieDetail: React.FC = () => {
     const [isFavoriteMovie, setIsFavoriteMovie] = useState(false);
     const [movie, setMovie] = useState<Movie | null>(null);
     const [loading, setLoading] = useState(true);
+    const [favoriteLoading, setFavoriteLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -82,36 +84,39 @@ const handleFavoriteMovie = async () => {
     return;
   }
 
-  setLoading(true);
+  if (!movie) {
+    toast.error("Không tìm thấy thông tin phim");
+    return;
+  }
+
+  setFavoriteLoading(true);
 
   try {
-    const url = isFavoriteMovie
-      ? `${endpointBe}/favorites/remove/${movie?.id}`
-      : `${endpointBe}/favorites/add`;
+    if (isFavoriteMovie) {
+      // Xóa khỏi yêu thích
+      const response = await fetch(`${endpointBe}/favorites/remove/${movie.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
-    const response = await fetch(url, {
-      method: isFavoriteMovie ? "DELETE" : "POST",
-      credentials: "include", // ✅ gửi cookie HttpOnly
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: isFavoriteMovie ? undefined : JSON.stringify({ movieId: movie?.id }),
-    });
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result?.message || "Không thể xóa khỏi yêu thích");
+      }
 
-    const result = await response.json();
-    if (!response.ok) throw new Error(result?.message || "Thao tác thất bại");
-
-    setIsFavoriteMovie(!isFavoriteMovie);
-    toast.success(
-      isFavoriteMovie
-        ? "Đã xóa khỏi danh sách yêu thích"
-        : "Đã thêm vào danh sách yêu thích"
-    );
-  } catch (err) {
-    console.error("❌ Không thể cập nhật danh sách yêu thích:", err);
-    toast.error("Không thể cập nhật danh sách yêu thích");
+      setIsFavoriteMovie(false);
+      toast.success("Đã xóa khỏi danh sách yêu thích");
+    } else {
+      // Thêm vào yêu thích
+      await addFavorite(Number(movie.id));
+      setIsFavoriteMovie(true);
+      toast.success("Đã thêm vào danh sách yêu thích");
+    }
+  } catch (err: any) {
+    console.error("❌ Lỗi khi cập nhật yêu thích:", err);
+    toast.error(err.message || "Không thể cập nhật danh sách yêu thích");
   } finally {
-    setLoading(false);
+    setFavoriteLoading(false);
   }
 };
 
@@ -183,9 +188,13 @@ const handleFavoriteMovie = async () => {
                             <button
                                 className={`btn btn-sm ${isFavoriteMovie ? "btn-danger" : "btn-outline-secondary"}`}
                                 onClick={handleFavoriteMovie}
+                                disabled={favoriteLoading}
                             >
                                 <i className={`fas fa-heart ${isFavoriteMovie ? "" : "text-muted"}`}></i>
-                                {isFavoriteMovie ? " Bỏ yêu thích" : " Yêu thích"}
+                                {favoriteLoading 
+                                    ? " Đang xử lý..." 
+                                    : (isFavoriteMovie ? " Bỏ yêu thích" : " Yêu thích")
+                                }
                             </button>
                         </div>
                     </div>
