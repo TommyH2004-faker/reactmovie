@@ -12,12 +12,13 @@ import { toast } from "react-toastify";
 import { endpointBe } from "../../utils/contant";
 import ReviewPage from "./components/Review/ReviewPage";
 import useScrollToTop from "../../hooks/ScrollToTop";
-import { getIdUserByServer, isAuthenticated } from "../../utils/JwtService";
+import { useAuth } from "../../utils/AuthContext";
 
 const MovieDetail: React.FC = () => {
     useScrollToTop();
     const { movieId } = useParams();
     const navigate = useNavigate();
+    const { isLoggedIn, userInfo } = useAuth();
     const [isFavoriteMovie, setIsFavoriteMovie] = useState(false);
     const [movie, setMovie] = useState<Movie | null>(null);
     const [loading, setLoading] = useState(true);
@@ -46,13 +47,14 @@ const MovieDetail: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
 useEffect(() => {
   const checkFavoriteStatus = async () => {
-    if (!movie) return;
+    console.log("🔍 checkFavoriteStatus - movie:", movie?.id);
+    console.log("🔍 checkFavoriteStatus - isLoggedIn:", isLoggedIn); 
+    console.log("🔍 checkFavoriteStatus - userInfo:", userInfo);
+    
+    if (!movie || !isLoggedIn || !userInfo?.id) return;
 
     try {
-      const userId = await getIdUserByServer(); // ✅ thêm await ở đây
-      if (!userId) return;
-
-      const res = await fetch(`${endpointBe}/favorites/get-favorite-movie/${userId}`, {
+      const res = await fetch(`${endpointBe}/favorites/get-favorite-movie/${userInfo.id}`, {
         credentials: "include",
       });
 
@@ -72,13 +74,16 @@ useEffect(() => {
   };
 
   checkFavoriteStatus();
-}, [movie]);
+}, [movie, isLoggedIn, userInfo]);
 
 
 const handleFavoriteMovie = async () => {
+  // Debug thông tin user
+  console.log("🔍 Debug - isLoggedIn:", isLoggedIn);
+  console.log("🔍 Debug - userInfo:", userInfo);
+  
   // Kiểm tra đăng nhập trước khi thực hiện
-  const loggedIn = await isAuthenticated();
-  if (!loggedIn) {
+  if (!isLoggedIn) {
     toast.info("Bạn cần đăng nhập để thực hiện chức năng này");
     navigate("/dangnhap");
     return;
