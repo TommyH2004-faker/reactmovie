@@ -22,6 +22,7 @@ export async function addFavorite(movieId: number, userId: number): Promise<any 
             headers: {
                 "Content-Type": "application/json",
             },
+            credentials: "include", // Gửi cookie authentication
             body: JSON.stringify({ movieId, userId }),
         });
         if (!response.ok) {
@@ -40,6 +41,7 @@ export async function deleteFavorite(favoriteId: number): Promise<boolean> {
     try {
         const response = await fetch(url, {
             method: "DELETE",
+            credentials: "include", // Gửi cookie authentication
         });
         return response.ok;
     } catch (error) {
