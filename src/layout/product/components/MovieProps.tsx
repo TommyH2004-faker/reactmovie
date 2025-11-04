@@ -210,56 +210,15 @@ useEffect(() => {
 
  
 /** Thêm / Xóa khỏi danh sách yêu thích */
-// const handleFavoriteToggle = async () => {
-//   // ⚠️ Kiểm tra đăng nhập (dùng hàm async!)
-//   const loggedIn = await isAuthenticated();
-//   if (!loggedIn) {
-//     toast.info("Bạn phải đăng nhập để sử dụng chức năng này");
-//     return navigate("/dangnhap");
-//   }
-
-//   setLoading(true);
-//   try {
-//     const url = isFavorite
-//       ? `${endpointBe}/favorites/remove/${movie.id}`
-//       : `${endpointBe}/favorites/add`;
-
-//     const response = await fetch(url, {
-//       method: isFavorite ? "DELETE" : "POST",
-//       credentials: "include", // ✅ gửi cookie HttpOnly
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: isFavorite ? undefined : JSON.stringify({ movieId: movie.id }),
-//     });
-
-//     const result = await response.json();
-//     if (!response.ok) throw new Error(result?.message || "Thao tác thất bại");
-
-//     setIsFavorite(!isFavorite);
-//     toast.success(
-//       isFavorite
-//         ? "Đã xóa khỏi danh sách yêu thích"
-//         : "Đã thêm vào danh sách yêu thích"
-//     );
-//   } catch (err) {
-//     console.error("❌ Không thể cập nhật danh sách yêu thích:", err);
-//     toast.error("Không thể cập nhật danh sách yêu thích");
-//   } finally {
-//     setLoading(false);
-//   }
-// };
 const handleFavoriteToggle = async () => {
-  // Kiểm tra đăng nhập trước khi thực hiện
+  // ⚠️ Kiểm tra đăng nhập (dùng hàm async!)
   const loggedIn = await isAuthenticated();
   if (!loggedIn) {
-    toast.info("Bạn cần đăng nhập để thực hiện chức năng này");
-    navigate("/dangnhap");
-    return;
+    toast.info("Bạn phải đăng nhập để sử dụng chức năng này");
+    return navigate("/dangnhap");
   }
 
   setLoading(true);
-
   try {
     const url = isFavorite
       ? `${endpointBe}/favorites/remove/${movie.id}`
@@ -267,11 +226,11 @@ const handleFavoriteToggle = async () => {
 
     const response = await fetch(url, {
       method: isFavorite ? "DELETE" : "POST",
-      credentials: "include", // ✅ gửi cookie HttpOnly
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
-      body: isFavorite ? undefined : JSON.stringify({ movieId: Number(movie.id) }),
+      body: isFavorite ? undefined : JSON.stringify({ movieId: movie.id }),
     });
 
     const result = await response.json();
@@ -290,6 +249,7 @@ const handleFavoriteToggle = async () => {
     setLoading(false);
   }
 };
+
 
 
   /** 🎨 JSX giao diện phim */
