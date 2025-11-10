@@ -360,7 +360,7 @@
 // };
 
 // export default ProfilePage;
-import React, { useEffect, useState, FormEvent } from "react";
+import React, { useEffect, useLayoutEffect, useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Avatar,
@@ -400,20 +400,17 @@ import { useAuth } from "../utils/AuthContext";
 import { User } from "../types/user";
 import { endpointBe } from "../utils/contant";
 import HiddenInputUpload from "../utils/HiddenInputUpload";
+
 import { deleteReview, updateReview } from "../api/ReviewApi";
+
 const ProfilePage: React.FC = () => {
   useScrollToTop();
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
-//   useLayoutEffect(() => {
-//   if (!isLoggedIn) navigate("/dangnhap");
-// }, [isLoggedIn, navigate]);
-
- useEffect(() => {
-  if (!isLoggedIn) navigate("/dangnhap");
-}, [isLoggedIn, navigate]);
-
+  useLayoutEffect(() => {
+    if (!isLoggedIn) navigate("/dangnhap");
+  }, [isLoggedIn, navigate]);
 
   const [tabValue, setTabValue] = useState(0);
 
@@ -424,7 +421,7 @@ const ProfilePage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [userInfo, setUserInfo] = useState<User | null>(null);
+  const { userInfo, setUserInfo } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [previewAvatar, setPreviewAvatar] = useState("");
   const [, setDataAvatar] = useState("");
@@ -586,10 +583,12 @@ const handleSubmitAvatar = async () => {
         // Cập nhật state local
         setUser((prev) => prev ? { ...prev, avatar: newAvatarUrl } : prev);
         setPreviewAvatar(newAvatarUrl);
-        setUserInfo((prev) =>
-          prev ? { ...prev, avatar: newAvatarUrl } : prev
-        );
-        
+
+        // Cập nhật AuthContext
+        setUserInfo((prev) => prev ? { 
+          ...prev,
+          avatar: newAvatarUrl 
+        } : prev);
 
         console.log('Đã cập nhật avatar URL:', newAvatarUrl);
         toast.success("Cập nhật ảnh đại diện thành công!");
@@ -733,13 +732,8 @@ const confirmDelete = async () => {
   );
 };
 
-// if (!isLoggedIn) return null; // vẫn redirect như cũ
-  if (!isLoggedIn) return null; // vẫn redirect như cũ
 
-if (!user) {
-  return <div>Đang tải thông tin người dùng...</div>; // hoặc spinner
-}
-
+  if (!isLoggedIn || !user) return null;
 
   return (
     <div className="container my-5">
