@@ -294,6 +294,147 @@
 //   }
 //   return context;
 // };
+// import React, { createContext, useContext, useState, useEffect } from "react";
+// import { endpointBe } from "./contant";
+
+// /** 🧩 Kiểu props cho Provider */
+// interface AuthContextProps {
+//   children: React.ReactNode;
+// }
+
+// /** 🧠 Kiểu thông tin người dùng */
+// interface UserInfo {
+//   id?: number;
+//   username: string;
+//   email?: string;
+//   role: string;
+//   avatar?: string;
+// }
+
+// /** 🧱 Kiểu cho context */
+// interface AuthContextType {
+//   isLoggedIn: boolean;
+//   userInfo: UserInfo | null;
+//   setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+//   setUserInfo: React.Dispatch<React.SetStateAction<UserInfo | null>>;
+//   isLoading: boolean;
+//   logout: () => Promise<void>;
+//   refreshProfile: () => Promise<void>; // 👈 Thêm hàm để component khác có thể reload profile
+// }
+
+// /** 🧰 Hàm kiểm tra cookie (tránh gọi API thừa) */
+// const hasAuthCookie = (): boolean => {
+//   return (
+//     document.cookie.includes("Authentication=") ||
+//     document.cookie.includes("access_token=")
+//   );
+// };
+
+// /** 🧱 Tạo context */
+// const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// /** ✅ Provider chính */
+// export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
+//   const [isLoggedIn, setLoggedIn] = useState(false);
+//   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [hasFetched, setHasFetched] = useState(false); // 👈 đảm bảo không fetch lặp
+
+//   /** 🧭 Hàm lấy profile từ server */
+//   const fetchProfile = async () => {
+//     if (!hasAuthCookie()) {
+//       setLoggedIn(false);
+//       setUserInfo(null);
+//       setIsLoading(false);
+//       setHasFetched(true);
+//       return;
+//     }
+
+//     try {
+//       const res = await fetch(`${endpointBe}/auth/profile`, {
+//         credentials: "include",
+//       });
+
+//       if (res.ok) {
+//         const data = await res.json();
+//          console.log("🔥 Profile from server:", data); // <--- thêm đây
+//         setLoggedIn(true);
+//         setUserInfo({
+//           id: data.id,
+//           username: data.username || data.email,
+//           email: data.email,
+//           role: data.roles?.[0] || data.role || "USER",
+//           avatar: data.avatar,
+//         });
+//       } else if (res.status === 401) {
+//         setLoggedIn(false);
+//         setUserInfo(null);
+//       } else {
+//         console.warn("⚠️ Không lấy được profile:", res.status);
+//         setLoggedIn(false);
+//         setUserInfo(null);
+//       }
+//     } catch (err) {
+//       console.error("❌ Lỗi khi gọi /auth/profile:", err);
+//       setLoggedIn(false);
+//       setUserInfo(null);
+//     } finally {
+//       setIsLoading(false);
+//       setHasFetched(true);
+//     }
+//   };
+
+//   /** 🧩 Gọi khi app khởi động */
+//   useEffect(() => {
+//     if (!hasFetched) fetchProfile();
+//   }, [hasFetched]);
+
+//   /** 🚪 Hàm đăng xuất */
+//   const logout = async () => {
+//     try {
+//       await fetch(`${endpointBe}/auth/logout`, {
+//         method: "POST",
+//         credentials: "include",
+//       });
+//     } catch (err) {
+//       console.error("❌ Lỗi khi logout:", err);
+//     } finally {
+//       setLoggedIn(false);
+//       setUserInfo(null);
+//     }
+//   };
+
+//   /** 🔁 Cho phép component khác gọi lại nếu cần */
+//   const refreshProfile = async () => {
+//     setIsLoading(true);
+//     await fetchProfile();
+//   };
+
+//   return (
+//     <AuthContext.Provider
+//       value={{
+//         isLoggedIn,
+//         userInfo,
+//         setLoggedIn,
+//         setUserInfo,
+//         isLoading,
+//         logout,
+//         refreshProfile,
+//       }}
+//     >
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// };
+
+// /** 🪄 Hook dùng để truy cập AuthContext */
+// export const useAuth = (): AuthContextType => {
+//   const context = useContext(AuthContext);
+//   if (!context) {
+//     throw new Error("useAuth phải được dùng trong AuthProvider");
+//   }
+//   return context;
+// };
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { endpointBe } from "./contant";
 
@@ -304,7 +445,7 @@ interface AuthContextProps {
 
 /** 🧠 Kiểu thông tin người dùng */
 interface UserInfo {
-  id?: number;
+  id: number;
   username: string;
   email?: string;
   role: string;
@@ -319,10 +460,10 @@ interface AuthContextType {
   setUserInfo: React.Dispatch<React.SetStateAction<UserInfo | null>>;
   isLoading: boolean;
   logout: () => Promise<void>;
-  refreshProfile: () => Promise<void>; // 👈 Thêm hàm để component khác có thể reload profile
+  refreshProfile: () => Promise<void>;
 }
 
-/** 🧰 Hàm kiểm tra cookie (tránh gọi API thừa) */
+/** 🧰 Kiểm tra cookie (tránh gọi API thừa) */
 const hasAuthCookie = (): boolean => {
   return (
     document.cookie.includes("Authentication=") ||
@@ -338,9 +479,9 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasFetched, setHasFetched] = useState(false); // 👈 đảm bảo không fetch lặp
+  const [hasFetched, setHasFetched] = useState(false);
 
-  /** 🧭 Hàm lấy profile từ server */
+  /** 🧭 Lấy profile từ server */
   const fetchProfile = async () => {
     if (!hasAuthCookie()) {
       setLoggedIn(false);
@@ -355,25 +496,32 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
         credentials: "include",
       });
 
-      if (res.ok) {
-        const data = await res.json();
-         console.log("🔥 Profile from server:", data); // <--- thêm đây
-        setLoggedIn(true);
-        setUserInfo({
-          id: data.id,
-          username: data.username || data.email,
-          email: data.email,
-          role: data.roles?.[0] || data.role || "USER",
-          avatar: data.avatar,
-        });
-      } else if (res.status === 401) {
-        setLoggedIn(false);
-        setUserInfo(null);
-      } else {
-        console.warn("⚠️ Không lấy được profile:", res.status);
-        setLoggedIn(false);
-        setUserInfo(null);
+      if (!res.ok) {
+        if (res.status === 401) {
+          setLoggedIn(false);
+          setUserInfo(null);
+        } else {
+          console.warn("⚠️ Không lấy được profile:", res.status);
+          setLoggedIn(false);
+          setUserInfo(null);
+        }
+        return;
       }
+
+      const data = await res.json();
+      console.log("🔥 Profile from server:", data);
+
+      setLoggedIn(true);
+      setUserInfo({
+        id: data.id,
+        username: data.name || data.username || data.email, // map đúng field backend
+        email: data.email,
+        role:
+          Array.isArray(data.roles) && data.roles.length > 0
+            ? data.roles[0]
+            : data.role || "USER",
+        avatar: data.avatar || data.avatar_url || "",
+      });
     } catch (err) {
       console.error("❌ Lỗi khi gọi /auth/profile:", err);
       setLoggedIn(false);
@@ -389,7 +537,7 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
     if (!hasFetched) fetchProfile();
   }, [hasFetched]);
 
-  /** 🚪 Hàm đăng xuất */
+  /** 🚪 Đăng xuất */
   const logout = async () => {
     try {
       await fetch(`${endpointBe}/auth/logout`, {
@@ -404,7 +552,7 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
     }
   };
 
-  /** 🔁 Cho phép component khác gọi lại nếu cần */
+  /** 🔁 Cho phép component khác refresh profile */
   const refreshProfile = async () => {
     setIsLoading(true);
     await fetchProfile();
@@ -427,7 +575,7 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
   );
 };
 
-/** 🪄 Hook dùng để truy cập AuthContext */
+/** 🪄 Hook truy cập AuthContext */
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {

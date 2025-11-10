@@ -308,10 +308,17 @@ const handleSubmit = async (e: React.FormEvent) => {
     const userProfile = await profileRes.json();
 
     setLoggedIn(true);
+    // setUserInfo({
+    //   username: userProfile.email,
+    //   role: userProfile.roles?.[0] || "USER",
+    // });
     setUserInfo({
-      username: userProfile.email,
-      role: userProfile.roles?.[0] || "USER",
-    });
+  id: userProfile.id, // bắt buộc
+  username: userProfile.name || userProfile.email,
+  email: userProfile.email,
+  role: userProfile.roles?.[0] || "USER",
+  avatar: userProfile.avatar || userProfile.avatar_url || "",
+});
 
     toast.success("Đăng nhập thành công");
 
