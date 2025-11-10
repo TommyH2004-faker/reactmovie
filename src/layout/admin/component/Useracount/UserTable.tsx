@@ -1,6 +1,5 @@
 import { DeleteOutlineOutlined } from "@mui/icons-material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Box, CircularProgress, IconButton, Tooltip } from "@mui/material";
 import { GridColDef } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";

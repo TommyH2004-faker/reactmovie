@@ -74,7 +74,6 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { get3PhimMoiNhat } from "../../../api/movieApi";
 import { Movie } from "../../../types/movie";
-import { getMoviePoster } from "../../../api/movieApi";
 import "./Carousel.css";
 
 const Carousel: React.FC = () => {
