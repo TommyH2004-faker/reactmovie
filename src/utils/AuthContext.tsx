@@ -207,48 +207,76 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 🧭 Hàm lấy profile từ server
-  const fetchProfile = async () => {
-    // Nếu không có cookie thì không cần gọi API
-    if (!hasAuthCookie()) {
-      setLoggedIn(false);
-      setUserInfo(null);
-      setIsLoading(false);
-      return;
-    }
+  // // 🧭 Hàm lấy profile từ server
+  // const fetchProfile = async () => {
+  //   // Nếu không có cookie thì không cần gọi API
+  //   if (!hasAuthCookie()) {
+  //     setLoggedIn(false);
+  //     setUserInfo(null);
+  //     setIsLoading(false);
+  //     return;
+  //   }
 
-    try {
-      const res = await fetch(`${endpointBe}/auth/profile`, {
-        credentials: "include",
+  //   try {
+  //     const res = await fetch(`${endpointBe}/auth/profile`, {
+  //       credentials: "include",
+  //     });
+
+  //     if (res.ok) {
+  //       const data = await res.json();
+  //       setLoggedIn(true);
+  //       setUserInfo({
+  //         id: data.id,
+  //         username: data.username || data.email,
+  //         email: data.email,
+  //         role: data.roles?.[0] || data.role || "USER",
+  //         avatar: data.avatar,
+  //       });
+  //     } else if (res.status === 401) {
+  //       // ⚠️ Không cần log mỗi lần 401 nữa
+  //       setLoggedIn(false);
+  //       setUserInfo(null);
+  //     } else {
+  //       console.warn("⚠️ Không lấy được profile:", res.status);
+  //       setLoggedIn(false);
+  //       setUserInfo(null);
+  //     }
+  //   } catch (err) {
+  //     console.error("❌ Lỗi khi gọi /auth/profile:", err);
+  //     setLoggedIn(false);
+  //     setUserInfo(null);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+const fetchProfile = async () => {
+  try {
+    const res = await fetch(`${endpointBe}/auth/profile`, {
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      setLoggedIn(true);
+      setUserInfo({
+        id: data.id,
+        username: data.username || data.email,
+        email: data.email,
+        role: data.roles?.[0] || data.role || "USER",
+        avatar: data.avatar,
       });
-
-      if (res.ok) {
-        const data = await res.json();
-        setLoggedIn(true);
-        setUserInfo({
-          id: data.id,
-          username: data.username || data.email,
-          email: data.email,
-          role: data.roles?.[0] || data.role || "USER",
-          avatar: data.avatar,
-        });
-      } else if (res.status === 401) {
-        // ⚠️ Không cần log mỗi lần 401 nữa
-        setLoggedIn(false);
-        setUserInfo(null);
-      } else {
-        console.warn("⚠️ Không lấy được profile:", res.status);
-        setLoggedIn(false);
-        setUserInfo(null);
-      }
-    } catch (err) {
-      console.error("❌ Lỗi khi gọi /auth/profile:", err);
+    } else if (res.status === 401) {
       setLoggedIn(false);
       setUserInfo(null);
-    } finally {
-      setIsLoading(false);
+    } else {
+      console.warn("⚠️ Không lấy được profile:", res.status);
     }
-  };
+  } catch (err) {
+    console.error("❌ Lỗi khi gọi /auth/profile:", err);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   // 🧩 Gọi khi app khởi động
   useEffect(() => {
