@@ -510,6 +510,13 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
 
       const data = await res.json();
       console.log("🔥 Profile from server:", data);
+      console.log("🖼️ Debug avatar fields:", {
+        avatar: data.avatar,
+        avatar_url: data.avatar_url,
+        avatarUrl: data.avatarUrl,
+        image: data.image,
+        photo: data.photo
+      });
 
       setLoggedIn(true);
       setUserInfo({
@@ -520,7 +527,7 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
           Array.isArray(data.roles) && data.roles.length > 0
             ? data.roles[0]
             : data.role || "USER",
-        avatar: data.avatar || data.avatar_url || "",
+        avatar: data.avatar || data.avatar_url || data.avatarUrl || "",
       });
     } catch (err) {
       console.error("❌ Lỗi khi gọi /auth/profile:", err);
