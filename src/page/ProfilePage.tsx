@@ -406,9 +406,14 @@ const ProfilePage: React.FC = () => {
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
-  useLayoutEffect(() => {
-    if (!isLoggedIn) navigate("/dangnhap");
-  }, [isLoggedIn, navigate]);
+//   useLayoutEffect(() => {
+//   if (!isLoggedIn) navigate("/dangnhap");
+// }, [isLoggedIn, navigate]);
+
+ useEffect(() => {
+  if (!isLoggedIn) navigate("/dangnhap");
+}, [isLoggedIn, navigate]);
+
 
   const [tabValue, setTabValue] = useState(0);
 
@@ -728,8 +733,13 @@ const confirmDelete = async () => {
   );
 };
 
+// if (!isLoggedIn) return null; // vẫn redirect như cũ
+  if (!isLoggedIn) return null; // vẫn redirect như cũ
 
-  if (!isLoggedIn || !user) return null;
+if (!user) {
+  return <div>Đang tải thông tin người dùng...</div>; // hoặc spinner
+}
+
 
   return (
     <div className="container my-5">
