@@ -314,7 +314,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     // });
     setUserInfo({
   id: userProfile.id, // bắt buộc
-  username: userProfile.name || userProfile.email,
+  username: userProfile.name ,
   email: userProfile.email,
   role: userProfile.roles?.[0] || "USER",
   avatar: userProfile.avatar || userProfile.avatar_url || "",

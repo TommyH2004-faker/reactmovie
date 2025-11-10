@@ -514,7 +514,7 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
       setLoggedIn(true);
       setUserInfo({
         id: data.id,
-        username: data.name || data.username || data.email, // map đúng field backend
+        username: data.name, // map đúng field backend
         email: data.email,
         role:
           Array.isArray(data.roles) && data.roles.length > 0
