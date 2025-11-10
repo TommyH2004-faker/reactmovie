@@ -210,7 +210,7 @@ const CommentPage: React.FC = () => {
   useEffect(() => {
     if (!movieId) return;
     fetchComments();
-  }, [movieId]);
+  }, [movieId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchComments = async () => {
     try {

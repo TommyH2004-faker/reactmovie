@@ -82,7 +82,7 @@ const FilterPage: React.FC<FilterPageProps> = ({ keySearchNav }) => {
 export default FilterPage;*/
 // FilterPage.tsx
 import { useState, useEffect } from "react";
-import { useSearchParams, useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import useScrollToTop from "../../hooks/ScrollToTop";
 import ToolFilter from "./components/ToolFiller";
 import MovieList from "../../layout/product/MovieList";

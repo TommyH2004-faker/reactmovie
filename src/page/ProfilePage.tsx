@@ -422,7 +422,7 @@ const ProfilePage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const { userInfo, setUserInfo } = useAuth();
+  const { setUserInfo } = useAuth();
  useEffect(() => {
   const fetchUser = async () => {
     try {

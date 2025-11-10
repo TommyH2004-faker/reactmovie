@@ -39,7 +39,7 @@ useEffect(() => {
   useEffect(() => {
     if (!movieId) return;
     fetchReviews();
-  }, [movieId]);
+  }, [movieId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchReviews = async () => {
     try {
