@@ -136,7 +136,6 @@ const handleSubmit = async (event: React.FormEvent) => {
       );
 
       if (response.ok) {
-        const result = await response.json();
         toast.success(
           "Đăng ký tài khoản thành công. Vui lòng kiểm tra email để kích hoạt tài khoản."
         );

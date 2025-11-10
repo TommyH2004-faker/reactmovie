@@ -2,7 +2,6 @@
 import { endpointBe } from "../utils/contant";
 import { my_request } from "../utils/Request";
 import {CommentMovie} from "../types/comment";
-import {toast} from "react-toastify";
 
 // Fetch all comments
 export async function getComments(): Promise<CommentMovie[]> {
