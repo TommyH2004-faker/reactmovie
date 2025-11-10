@@ -1,141 +1,42 @@
-// import { jwtDecode } from "jwt-decode";
-// import { JwtPayload } from "../admin/RequireAdmin";
-
-// export function isTokenExpired(token: string) {
-//    const decodedToken = jwtDecode(token) as { exp?: number };
-
-//    if (!decodedToken.exp) {
-//       return false; // Không có exp => coi như không hết hạn
-//    }
-
-//    const currentTime = Date.now() / 1000;
-//    return currentTime > decodedToken.exp;
-// }
-
-// export function isToken() {
-//    const token = localStorage.getItem('access_token');
-//    return !!token;
-// }
-
-// export function isTokenValid() {
-//    const token = localStorage.getItem('access_token');
-//    if (!token) return false;
-//    return !isTokenExpired(token);
-// }
-
-// export function getUserNameByToken() {
-//    const token = localStorage.getItem('access_token');
-//    if (token) {
-//       const decodedToken = jwtDecode(token) as JwtPayload;
-//       return decodedToken.name;
-//    }
-// }
-
-// export function getSubByToken() {
-//    const token = localStorage.getItem('access_token');
-//    if (token) {
-//       return (jwtDecode(token) as JwtPayload).sub;
-//    }
-// }
-
-// export function getAvatarByToken() {
-//    const token = localStorage.getItem('access_token');
-//    if (token) {
-//       const decodedToken = jwtDecode(token) as JwtPayload;
-//       return decodedToken.avatar;
-//    }
-// }
-
-// // export function getIdUserByToken() {
-// //    const token = localStorage.getItem('access_token');
-// //    if (token) {
-// //       const decodedToken = jwtDecode(token) as JwtPayload;
-// //       return decodedToken.sub;
-// //    }
-// // }
-// export function getIdUserByToken(): number | null {
-//     const token = localStorage.getItem('access_token');
-//     if (!token) return null;
-
-//     const decodedToken = jwtDecode<JwtPayload & { sub: number | string }>(token);
-//     return Number(decodedToken.sub) || null;
-// }
-
-
-// export function getRoleByToken(): string | null {
-//   const token = localStorage.getItem("access_token");
-//   if (!token) return null;
-//   const decodedToken = jwtDecode(token) as any;
-//   // Nếu role là object
-//   if (decodedToken.role && typeof decodedToken.role === "object") {
-//     return decodedToken.role.name;
-//   }
-//   // Nếu role là string
-//   if (typeof decodedToken.role === "string") {
-//     return decodedToken.role;
-//   }
-//   // Nếu roles là mảng (trường hợp khác)
-//   if (decodedToken.roles && Array.isArray(decodedToken.roles) && decodedToken.roles.length > 0) {
-//     return decodedToken.roles[0].name;
-//   }
-//   return null;
-// }
-// export function logout(navigate: any) {
-//    localStorage.removeItem('access_token');
-//    localStorage.removeItem('refresh_token');
-//    navigate("/");
-// }
 
 // import axios from "axios";
 // import { NavigateFunction } from "react-router-dom";
+// import { endpointBe } from "./contant";
 
-// // ⚙️ Cấu hình axios gửi kèm cookie trong mọi request
 // axios.defaults.withCredentials = true;
-
-// const API_BASE = "http://localhost:3000";
-
-// /**
-//  * Kiểm tra nhanh phía client xem có cookie đăng nhập không
-//  */
 // export function hasAuthCookie(): boolean {
-//   // ⚠️ Cookie HttpOnly không thể đọc từ JS — nên luôn giả định là có thể có cookie
+
 //   return true;
 // }
 
 
 // export async function getProfileFromServer() {
 //   if (!hasAuthCookie()) {
-//     console.log("⏸️ Không có cookie -> bỏ qua gọi /auth/profile");
 //     return null;
 //   }
 
 //   try {
-//     const res = await axios.get(`${API_BASE}/auth/profile`, {
+//     const res = await axios.get(`${endpointBe}/auth/profile`, {
 //       withCredentials: true,
-//       validateStatus: () => true, // để tự xử lý lỗi
+//       validateStatus: () => true, 
 //     });
 
 //     if (res.status === 401) {
-//       console.log("⏸️ Server trả 401 -> chưa đăng nhập");
 //       return null;
 //     }
-
-//     if (res.status === 200) {
-//       console.log("📦 Profile response:", res.data);
+//     if (res.status === 200 && res.data) {
 //       return res.data;
 //     }
 
-//     console.warn("⚠️ Lỗi profile:", res.status, res.data);
+//     console.warn("⚠️ Không lấy được profile:", res.status, res.data);
 //     return null;
 //   } catch (err) {
-//     console.warn("⚠️ Bỏ qua lỗi lấy profile:", err);
+//     console.error("❌ Lỗi khi lấy profile:", err);
 //     return null;
 //   }
 // }
 
-// /**
-//  * Kiểm tra xem người dùng có đăng nhập không
-//  */
+
 // export async function isAuthenticated(): Promise<boolean> {
 //   const profile = await getProfileFromServer();
 //   return !!profile;
@@ -171,9 +72,9 @@
 //  */
 // export async function logout(navigate?: NavigateFunction) {
 //   try {
-//     await axios.post(`${API_BASE}/auth/logout`, {}, { withCredentials: true });
+//     await axios.post(`${endpointBe}/auth/logout`, {}, { withCredentials: true });
 //   } catch (err) {
-//     console.error("❌ Lỗi khi đăng xuất:", err);
+//     console.error(" Lỗi khi đăng xuất:", err);
 //   }
 
 //   if (navigate) navigate("/dangnhap");
@@ -187,46 +88,66 @@
 //   if (!profile) return null;
 //   return {
 //     username: profile.username,
-//     role: Array.isArray(profile.roles) ? profile.roles[0] : profile.role,
+//     role: Array.isArray(profile.roles) ? profile.roles[0] : profile.role || "USER",
 //   };
 // }
+
+
 import axios from "axios";
 import { NavigateFunction } from "react-router-dom";
 import { endpointBe } from "./contant";
 
-// ⚙️ Cấu hình axios gửi kèm cookie trong mọi request
+// ⚙️ Cấu hình axios luôn gửi cookie
 axios.defaults.withCredentials = true;
 
+// 💡 Bộ nhớ cache tạm để tránh gọi lại liên tục
+let cachedProfile: any | null = null;
+let lastProfileCheckTime = 0;
+const CACHE_DURATION = 10 * 1000; // cache 10 giây
 
-
+/**
+ * Kiểm tra nhanh phía client xem có token (localStorage) hay không
+ * 👉 Nếu bạn dùng cookie HttpOnly thì chỉ trả về true, để server tự quyết định.
+ */
 export function hasAuthCookie(): boolean {
-  // HttpOnly cookies cannot be reliably read from JavaScript (document.cookie).
-  // If the server sets HttpOnly cookies for auth, checking document.cookie will incorrectly
-  // report "no cookie" even when the browser sends the cookie on requests.
-  //
-  // Therefore, be optimistic here and let the server decide by calling /auth/profile.
-  // Returning true causes callers to attempt a server-side profile check which will
-  // return 200 (authenticated) or 401 (not authenticated).
+  // Nếu bạn vẫn dùng localStorage token thì bật dòng này:
+  // return !!localStorage.getItem("access_token");
+
+  // Nếu bạn chỉ dùng cookie HttpOnly:
   return true;
 }
 
-
+/**
+ * ✅ Lấy thông tin profile từ server
+ * - Không spam request liên tục
+ * - Tự cache tạm 10 giây để UI không gọi lại
+ */
 export async function getProfileFromServer() {
-  if (!hasAuthCookie()) {
-    return null;
+  const now = Date.now();
+
+  // Dùng cache tạm để tránh gọi lặp lại nhiều lần
+  if (cachedProfile && now - lastProfileCheckTime < CACHE_DURATION) {
+    return cachedProfile;
   }
+
+  // Nếu không có auth cookie/token, bỏ qua luôn
+  if (!hasAuthCookie()) return null;
 
   try {
     const res = await axios.get(`${endpointBe}/auth/profile`, {
       withCredentials: true,
-      validateStatus: () => true, 
+      validateStatus: () => true,
     });
 
-    if (res.status === 401) {
-      return null;
-    }
     if (res.status === 200 && res.data) {
+      cachedProfile = res.data;
+      lastProfileCheckTime = now;
       return res.data;
+    }
+
+    if (res.status === 401) {
+      cachedProfile = null; // xóa cache nếu chưa login
+      return null;
     }
 
     console.warn("⚠️ Không lấy được profile:", res.status, res.data);
@@ -237,14 +158,16 @@ export async function getProfileFromServer() {
   }
 }
 
-
+/**
+ * Kiểm tra login
+ */
 export async function isAuthenticated(): Promise<boolean> {
   const profile = await getProfileFromServer();
   return !!profile;
 }
 
 /**
- * Các hàm phụ trợ lấy thông tin user (chỉ gọi server khi có cookie)
+ * Các hàm phụ trợ
  */
 export async function getUserNameByServer(): Promise<string | null> {
   const profile = await getProfileFromServer();
@@ -274,15 +197,16 @@ export async function getIdUserByServer(): Promise<number | null> {
 export async function logout(navigate?: NavigateFunction) {
   try {
     await axios.post(`${endpointBe}/auth/logout`, {}, { withCredentials: true });
+    cachedProfile = null; // xóa cache khi logout
   } catch (err) {
-    console.error(" Lỗi khi đăng xuất:", err);
+    console.error("❌ Lỗi khi đăng xuất:", err);
   }
 
   if (navigate) navigate("/dangnhap");
 }
 
 /**
- * Lấy thông tin cơ bản của user (username + role)
+ * Lấy thông tin cơ bản của user
  */
 export async function getUserInfo(): Promise<{ username: string; role: string } | null> {
   const profile = await getProfileFromServer();
