@@ -450,7 +450,7 @@ export const Chart: React.FC<ChartProps> = ({ movies }) => {
             </div>
           </div>
           <div className="col-lg-6 col-md-12 col-sm-12">
-            <div className="shadow-4 rounded p-5 mb-5 bg-light">
+            <div className="shadow-4 rounded p-5 mb-5 bg-dark">
               <h4 className="text-center mb-3">Top phim nổi bật<hr/></h4>
               <div className="row flex-column">
                 {topMovies.length===0 ? <div className="text-center w-100">Không có dữ liệu</div> :
