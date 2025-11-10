@@ -118,9 +118,7 @@ useEffect(() => {
     try {
       const response = await fetch(
         `${endpointBe}/favorites/get-favorite-movie/${userId}`,
-        {
-          credentials: "include", // nếu backend cần cookie
-        }
+        { credentials: "include" }
       );
 
       const idMovieList = await response.json();
@@ -152,7 +150,8 @@ useEffect(() => {
   };
 
   fetchFavoriteMovies();
-}, []);
+}, [isLoggedIn, userInfo?.id]); // <-- thêm isLoggedIn và userInfo.id
+
 
   if (loading) {
     return (
