@@ -64,7 +64,6 @@ export async function getMovieBySlugGenre(slug: string): Promise<MovieApiRespons
     const duongDan = `${endpointBe}/genres/slug/${slug}`;
     try {
         const response = await my_request(duongDan);
-        console.log('API Response:', response);
         return response;
     } catch (error) {
         console.error("Error fetching movies by genre slug:", error);

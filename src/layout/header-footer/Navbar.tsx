@@ -348,7 +348,6 @@ useEffect(() => {
   })
     .then(async (res) => {
       if (res.status === 401) {
-        console.log("❌ Chưa đăng nhập (401)");
         setLoggedIn(false);
         setUserInfo(null);
         return;

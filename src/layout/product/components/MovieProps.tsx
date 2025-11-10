@@ -189,7 +189,7 @@ useEffect(() => {
     const userId = await getIdUserByServer();
     const loggedIn = await isAuthenticated();
 
-    console.log('User ID from token:', userId);
+
 
     if (!userId || !loggedIn) return; // chưa login hoặc không có id → dừng
 
