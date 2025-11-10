@@ -159,7 +159,7 @@ export default function Navbar({ tuKhoaTimKiem, setTuKhoaTimKiem }: NavbarProps)
             size="small"
             sx={{ padding: 0.5 }}
           >
-            <Avatar
+            {/* <Avatar
             src={userInfo?.avatar || "/default-avatar.jpg"}
             alt={userInfo?.username || "User"}
             sx={{
@@ -171,7 +171,8 @@ export default function Navbar({ tuKhoaTimKiem, setTuKhoaTimKiem }: NavbarProps)
                 border: "2px solid rgba(255,255,255,0.5)",
               },
             }}
-/>
+/> */}
+<Avatar src={`${userInfo?.avatar}?t=${Date.now()}`} alt={userInfo?.username} />
 
           </IconButton>
           <Menu
