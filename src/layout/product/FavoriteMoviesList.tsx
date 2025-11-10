@@ -115,6 +115,7 @@ useEffect(() => {
     }
 
     const userId = userInfo.id;
+    
     try {
       const response = await fetch(
         `${endpointBe}/favorites/get-favorite-movie/${userId}`,
