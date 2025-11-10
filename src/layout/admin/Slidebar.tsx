@@ -12,11 +12,10 @@ import {
 } from "@mui/icons-material";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../utils/AuthContext";
-import { logout } from "../../utils/JwtService";
 
 const Slidebar: React.FC = () => {
-  const navigate = useNavigate();
-  const { setLoggedIn } = useAuth();
+ const { logout } = useAuth(); 
+const navigate = useNavigate(); 
 
   const menuItems = [
     { path: "/admin/dashboard", icon: <DashboardIcon fontSize="small" />, label: "Dashboard" },
@@ -96,20 +95,36 @@ const Slidebar: React.FC = () => {
               Thông tin cá nhân
             </Link>
             <div className="dropdown-divider"></div>
-            <button 
+            {/* <button 
               className="dropdown-item d-flex align-items-center py-2 text-danger" 
-              onClick={async () => {
-                try {
-                  setLoggedIn(false);
-                  logout(navigate);
-                } catch (error) {
-                  console.error('Lỗi khi đăng xuất:', error);
-                }
-              }}
+              // onClick={async () => {
+              //   try {
+              //     setLoggedIn(false);
+              //     logout(navigate);
+              //   } catch (error) {
+              //     console.error('Lỗi khi đăng xuất:', error);
+              //   }
+              // }}
+            
+
             >
               <ExitToAppIcon fontSize="small" className="me-2" />
               Đăng xuất
-            </button>
+            </button> */}
+            <button
+  className="dropdown-item d-flex align-items-center py-2 text-danger"
+  onClick={async () => {
+    try {
+      await logout();       // logout đã tự reset setLoggedIn & setUserInfo
+      navigate("/dangnhap"); // redirect về trang login sau logout
+    } catch (error) {
+      console.error("Lỗi khi đăng xuất:", error);
+    }
+  }}
+>
+  <ExitToAppIcon fontSize="small" className="me-2" />
+  Đăng xuất
+</button>
           </div>
         </div>
       </div>
