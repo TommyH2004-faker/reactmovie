@@ -1,6 +1,5 @@
 import { DeleteOutlineOutlined } from "@mui/icons-material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Box, CircularProgress, IconButton, Tooltip } from "@mui/material";
 import { GridColDef } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
@@ -8,13 +7,9 @@ import { toast } from "react-toastify";
 import { useConfirm } from "material-ui-confirm";
 
 import { endpointBe } from "../../../../utils/contant";
-
 import { Movie } from "../../../../types/movie";
 import { getAllMovies } from "../../../../api/movieApi";
 import { DataTable } from "../../../../utils/DataTable";
-import {text} from "node:stream/consumers";
-
-
 interface MovieTableProps {
     setOption: (option: string) => void;
     handleOpenModal: () => void;
@@ -51,46 +46,7 @@ export const MovieTable: React.FC<MovieTableProps> = (props) => {
         fetchData();
     }, [props.keyCountReload]);
 
-    // const handleDeleteMovie = async (id: number) => {
-    //     const result = await confirm({
-    //         title: "Xóa phim",
-    //         description: "Bạn chắc chắn muốn xóa phim này?",
-    //         confirmationText: "Xóa",
-    //         cancellationText: "Hủy",
-    //     });
 
-    //     if (!result.confirmed) {
-    //         toast.info("Đã huỷ xóa phim");
-    //         return;
-    //     }
-
-    //     try {
-    //         const token = localStorage.getItem("access_token");
-    //         if (!token) {
-    //             toast.error("Bạn chưa đăng nhập!");
-    //             return;
-    //         }
-
-
-    //         const response = await fetch(`${endpointBe}/movies/${id}`, {
-    //             method: "DELETE",
-    //             headers: {
-    //                 "Authorization": `Bearer ${token}`,
-    //             },
-    //         });
-
-    //         if (!response.ok) {
-    //             console.error("Delete failed:", response.status);
-    //             throw new Error("Lỗi khi xóa phim");
-    //         }
-
-    //         toast.success("Xóa phim thành công");
-    //         props.setKeyCountReload?.(Math.random());
-    //     } catch (error) {
-    //         console.error("Lỗi khi xóa phim:", error);
-    //         toast.error("Không thể xóa phim");
-    //     }
-    // };
     const handleDeleteMovie = async (id: number) => {
   const result = await confirm({
     title: "Xóa phim",

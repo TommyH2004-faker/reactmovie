@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getTotalOfMovies, getAllMovies, layToanBoPhim } from "../../api/movieApi";
+import { getTotalOfMovies, getAllMovies } from "../../api/movieApi";
 import { getAllGenres } from "../../api/genreApi";
 import { getComments } from "../../api/commentApi";
 import RequireAdmin from "../../admin/RequireAdmin";
