@@ -360,7 +360,7 @@
 // };
 
 // export default ProfilePage;
-import React, { useEffect, useLayoutEffect, useState, FormEvent } from "react";
+import React, { useEffect, useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Avatar,
