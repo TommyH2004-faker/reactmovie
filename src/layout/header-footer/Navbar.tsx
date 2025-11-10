@@ -24,9 +24,6 @@ import {
   AdminPanelSettings as AdminIcon,
   Logout as LogoutIcon,
 } from "@mui/icons-material";
-import { hasAuthCookie, logout } from "../../utils/JwtService";
-import { endpointBe } from "../../utils/contant";
-
 interface NavbarProps {
   tuKhoaTimKiem: string;
   setTuKhoaTimKiem: (tuKhoa: string) => void;
