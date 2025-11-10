@@ -457,7 +457,7 @@ useEffect(() => {
 
   const mappedUser: User = {
     id: userInfo.id || 0,
-    name: userInfo.username,   // map username sang name
+    name: userInfo.username || "",
     email: userInfo.email || "",
     role: userInfo.role,
     avatar: userInfo.avatar || "",

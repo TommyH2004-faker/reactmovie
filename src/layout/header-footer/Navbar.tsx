@@ -161,7 +161,7 @@ export default function Navbar({ tuKhoaTimKiem, setTuKhoaTimKiem }: NavbarProps)
           >
             <Avatar
             src={userInfo?.avatar || "/default-avatar.jpg"}
-            alt={userInfo?.name || "User"}
+            alt={userInfo?.username || "User"}
             sx={{
               width: 35,
               height: 35,
@@ -208,7 +208,7 @@ export default function Navbar({ tuKhoaTimKiem, setTuKhoaTimKiem }: NavbarProps)
                 Xin chào,
               </Typography>
               <Typography variant="body1" fontWeight="500">
-                {userInfo?.name}
+                {userInfo?.username}
               </Typography>
             </Box>
         

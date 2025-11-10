@@ -224,7 +224,7 @@ import { useAuth } from "./AuthContext";
  * 🔹 Lấy thông tin username từ AuthContext
  */
 export function getUserName(authContext: ReturnType<typeof useAuth>): string | null {
-  return authContext.userInfo?.name || null;
+  return authContext.userInfo?.username || null;
 }
 
 /**
