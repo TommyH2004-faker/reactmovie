@@ -424,7 +424,7 @@ const ProfilePage: React.FC = () => {
   const { userInfo, setUserInfo } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [previewAvatar, setPreviewAvatar] = useState("");
-  const [dataAvatar, setDataAvatar] = useState("");
+  const [, setDataAvatar] = useState("");
 
 //  useEffect(() => {
 //   const fetchUser = async () => {
