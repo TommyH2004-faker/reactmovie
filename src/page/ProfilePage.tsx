@@ -400,9 +400,7 @@ import { useAuth } from "../utils/AuthContext";
 import { User } from "../types/user";
 import { endpointBe } from "../utils/contant";
 import HiddenInputUpload from "../utils/HiddenInputUpload";
-
 import { deleteReview, updateReview } from "../api/ReviewApi";
-
 const ProfilePage: React.FC = () => {
   useScrollToTop();
   const { isLoggedIn } = useAuth();
