@@ -18,7 +18,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AddCommentIcon from "@mui/icons-material/AddComment";
-import { getIdUserByServer } from "../../../../utils/JwtService";
+import { useAuth } from "../../../../utils/AuthContext";
 
 const ReviewPage: React.FC = () => {
   const { movieId } = useParams<{ movieId: string }>();
@@ -26,14 +26,16 @@ const ReviewPage: React.FC = () => {
   const [newReview, setNewReview] = useState({ rating: 0, comment: "" });
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [loading, setLoading] = useState(true);
- const [userId, setUserId] = useState<number | null>(null);
+//  const [userId, setUserId] = useState<number | null>(null);
 
-useEffect(() => {
-  (async () => {
-    const id = await getIdUserByServer();
-    setUserId(id);
-  })();
-}, []);
+// useEffect(() => {
+//   (async () => {
+//     const id = await getIdUserByServer();
+//     setUserId(id);
+//   })();
+// }, []);
+const { userInfo } = useAuth();
+const userId = userInfo?.id || null;
 
 
   useEffect(() => {

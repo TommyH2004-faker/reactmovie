@@ -11,8 +11,9 @@ export class User {
   comments?: CommentMovie[];
   password?: string;
   avatar?: string;
+  role?: string;
 
-  constructor(id: number, name: string, email: string, gender: string, enabled: boolean, reviews?: Review[], comments?: CommentMovie[], password?: string, avatar?: string) {
+  constructor(id: number, name: string, email: string, gender: string, enabled: boolean, reviews?: Review[], comments?: CommentMovie[], password?: string, avatar?: string, role?: string) {
     this.id = id;
     this.name = name;
     this.email = email;
@@ -22,5 +23,6 @@ export class User {
     this.comments = comments;
     this.password = password;
     this.avatar = avatar;
+    this.role = role;
   }
 }

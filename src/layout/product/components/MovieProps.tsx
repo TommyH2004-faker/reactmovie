@@ -170,8 +170,9 @@ import { Movie } from "../../../types/movie";
 
 import { endpointBe } from "../../../utils/contant";
 import renderRating from "../../../utils/SaoXepHang";
-import { getIdUserByServer, isAuthenticated } from "../../../utils/JwtService";
+
 import useScrollToTop from "../../../hooks/ScrollToTop";
+import { useAuth } from "../../../utils/AuthContext";
 
 interface MoviePropsInterface {
   movie: Movie;
@@ -182,38 +183,93 @@ const MovieProps: React.FC<MoviePropsInterface> = ({ movie }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { userInfo, isLoggedIn } = useAuth();
 
+// useEffect(() => {
+//   const fetchFavorites = async () => {
+//     // ✅ Chờ Promise trả kết quả thật
+//     const userId = await getIdUserByServer();
+//     const loggedIn = await isAuthenticated();
+
+
+
+//     if (!userId || !loggedIn) return; // chưa login hoặc không có id → dừng
+
+//     try {
+//       const res = await fetch(`${endpointBe}/favorites/get-favorite-movie/${userId}`);
+//       const favoriteIds: number[] = await res.json();
+
+//       if (favoriteIds.includes(Number(movie.id))) {
+//         setIsFavorite(true);
+//       }
+//     } catch (err) {
+//       console.error('❌ Lỗi khi lấy danh sách phim yêu thích:', err);
+//     }
+//   };
+
+//   fetchFavorites();
+// }, [movie.id]);
 useEffect(() => {
   const fetchFavorites = async () => {
-    // ✅ Chờ Promise trả kết quả thật
-    const userId = await getIdUserByServer();
-    const loggedIn = await isAuthenticated();
-
-
-
-    if (!userId || !loggedIn) return; // chưa login hoặc không có id → dừng
+    if (!isLoggedIn || !userInfo?.id) return;
 
     try {
-      const res = await fetch(`${endpointBe}/favorites/get-favorite-movie/${userId}`);
+      const res = await fetch(`${endpointBe}/favorites/get-favorite-movie/${userInfo.id}`, {
+        credentials: "include",
+      });
       const favoriteIds: number[] = await res.json();
 
-      if (favoriteIds.includes(Number(movie.id))) {
-        setIsFavorite(true);
-      }
+      setIsFavorite(favoriteIds.includes(Number(movie.id)));
     } catch (err) {
       console.error('❌ Lỗi khi lấy danh sách phim yêu thích:', err);
     }
   };
 
   fetchFavorites();
-}, [movie.id]);
-
+}, [movie.id, isLoggedIn, userInfo]);
  
 /** Thêm / Xóa khỏi danh sách yêu thích */
+// const handleFavoriteToggle = async () => {
+//   // ⚠️ Kiểm tra đăng nhập (dùng hàm async!)
+//   const loggedIn = await isAuthenticated();
+//   if (!loggedIn) {
+//     toast.info("Bạn phải đăng nhập để sử dụng chức năng này");
+//     return navigate("/dangnhap");
+//   }
+
+//   setLoading(true);
+//   try {
+//     const url = isFavorite
+//       ? `${endpointBe}/favorites/remove/${movie.id}`
+//       : `${endpointBe}/favorites/add`;
+
+//     const response = await fetch(url, {
+//       method: isFavorite ? "DELETE" : "POST",
+//       credentials: "include",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: isFavorite ? undefined : JSON.stringify({ movieId: movie.id }),
+//     });
+
+//     const result = await response.json();
+//     if (!response.ok) throw new Error(result?.message || "Thao tác thất bại");
+
+//     setIsFavorite(!isFavorite);
+//     toast.success(
+//       isFavorite
+//         ? "Đã xóa khỏi danh sách yêu thích"
+//         : "Đã thêm vào danh sách yêu thích"
+//     );
+//   } catch (err) {
+//     console.error("❌ Không thể cập nhật danh sách yêu thích:", err);
+//     toast.error("Không thể cập nhật danh sách yêu thích");
+//   } finally {
+//     setLoading(false);
+//   }
+// };
 const handleFavoriteToggle = async () => {
-  // ⚠️ Kiểm tra đăng nhập (dùng hàm async!)
-  const loggedIn = await isAuthenticated();
-  if (!loggedIn) {
+  if (!isLoggedIn || !userInfo?.id) {
     toast.info("Bạn phải đăng nhập để sử dụng chức năng này");
     return navigate("/dangnhap");
   }
@@ -227,10 +283,8 @@ const handleFavoriteToggle = async () => {
     const response = await fetch(url, {
       method: isFavorite ? "DELETE" : "POST",
       credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: isFavorite ? undefined : JSON.stringify({ movieId: movie.id }),
+      headers: { "Content-Type": "application/json" },
+      body: isFavorite ? undefined : JSON.stringify({ movieId: movie.id, userId: userInfo.id }),
     });
 
     const result = await response.json();
@@ -249,7 +303,6 @@ const handleFavoriteToggle = async () => {
     setLoading(false);
   }
 };
-
 
 
   /** 🎨 JSX giao diện phim */

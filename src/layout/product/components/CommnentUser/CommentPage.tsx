@@ -183,7 +183,7 @@ import {
   getCommentsByMovie,
   updateComment,
 } from "../../../../api/commentApi";
-import { getIdUserByServer } from "../../../../utils/JwtService";
+import { useAuth } from "../../../../utils/AuthContext";
 
 const CommentPage: React.FC = () => {
   const { movieId } = useParams<{ movieId: string }>();
@@ -191,20 +191,20 @@ const CommentPage: React.FC = () => {
   const [newComment, setNewComment] = useState("");
   const [editingComment, setEditingComment] = useState<CommentMovie | null>(null);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState<number | null>(null);
+  const { userInfo, isLoggedIn } = useAuth();
 
   /** ✅ Lấy userId từ cookie (httpOnly) */
-  useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const id = await getIdUserByServer();
-        setUserId(id);
-      } catch (err) {
-        console.error("Không thể lấy userId:", err);
-      }
-    };
-    fetchUserId();
-  }, []);
+  // useEffect(() => {
+  //   const fetchUserId = async () => {
+  //     try {
+  //       const id = await getIdUserByServer();
+  //       setUserId(id);
+  //     } catch (err) {
+  //       console.error("Không thể lấy userId:", err);
+  //     }
+  //   };
+  //   fetchUserId();
+  // }, []);
 
   /** ✅ Load comments khi đổi movie */
   useEffect(() => {
@@ -225,25 +225,44 @@ const CommentPage: React.FC = () => {
     }
   };
 
-  const handleAddComment = async () => {
-    if (!userId) {
-      toast.warning("Bạn cần đăng nhập để bình luận.");
-      return;
-    }
-    if (!newComment.trim()) {
-      toast.warning("Vui lòng nhập nội dung bình luận!");
-      return;
-    }
-    try {
-      await addComment({ movieId: Number(movieId), content: newComment });
-      await fetchComments();
-      setNewComment("");
-      toast.success("Bình luận thành công!");
-    } catch (err) {
-      toast.error("Không thể gửi bình luận!");
-      console.error(err);
-    }
-  };
+  // const handleAddComment = async () => {
+  //   if (!userId) {
+  //     toast.warning("Bạn cần đăng nhập để bình luận.");
+  //     return;
+  //   }
+  //   if (!newComment.trim()) {
+  //     toast.warning("Vui lòng nhập nội dung bình luận!");
+  //     return;
+  //   }
+  //   try {
+  //     await addComment({ movieId: Number(movieId), content: newComment });
+  //     await fetchComments();
+  //     setNewComment("");
+  //     toast.success("Bình luận thành công!");
+  //   } catch (err) {
+  //     toast.error("Không thể gửi bình luận!");
+  //     console.error(err);
+  //   }
+  // };
+const handleAddComment = async () => {
+  if (!isLoggedIn || !userInfo?.id) {
+    toast.warning("Bạn cần đăng nhập để bình luận.");
+    return;
+  }
+  if (!newComment.trim()) {
+    toast.warning("Vui lòng nhập nội dung bình luận!");
+    return;
+  }
+  try {
+    await addComment({ movieId: Number(movieId), content: newComment });
+    await fetchComments();
+    setNewComment("");
+    toast.success("Bình luận thành công!");
+  } catch (err) {
+    toast.error("Không thể gửi bình luận!");
+    console.error(err);
+  }
+};
 
   const handleEditComment = (comment: CommentMovie) => {
     setEditingComment(comment);
@@ -302,7 +321,7 @@ const CommentPage: React.FC = () => {
             <p className="comment-content">{c.content}</p>
 
             {/* ✅ Kiểm tra userId bình thường, không await */}
-            {userId === c.user?.id && (
+            {/* {userId === c.user?.id && (
               <div className="comment-actions">
                 <button onClick={() => handleEditComment(c)}>
                   <EditIcon fontSize="small" /> Sửa
@@ -311,7 +330,18 @@ const CommentPage: React.FC = () => {
                   <DeleteIcon fontSize="small" /> Xóa
                 </button>
               </div>
-            )}
+            )} */}
+            {userInfo?.id === c.user?.id && (
+  <div className="comment-actions">
+    <button onClick={() => handleEditComment(c)}>
+      <EditIcon fontSize="small" /> Sửa
+    </button>
+    <button onClick={() => handleDeleteComment(c.id)}>
+      <DeleteIcon fontSize="small" /> Xóa
+    </button>
+  </div>
+)}
+
           </li>
         ))}
       </ul>

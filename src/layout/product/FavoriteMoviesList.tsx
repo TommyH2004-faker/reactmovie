@@ -85,7 +85,7 @@ import { Link } from "react-router-dom";
 import MovieProps from "./components/MovieProps"; // Component hiển thị phim
 import { layPhimById } from "../../api/movieApi";
 import useScrollToTop from "../../hooks/ScrollToTop";
-import { getIdUserByServer } from "../../utils/JwtService";
+import { useAuth } from "../../utils/AuthContext";
 
 interface FavoriteMoviesListProps {}
 
@@ -93,63 +93,28 @@ const FavoriteMoviesList: React.FC<FavoriteMoviesListProps> = () => {
     useScrollToTop();
   const [movieList, setMovieList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { userInfo, isLoggedIn } = useAuth();
 
-  // useEffect(() => {
-  //   const fetchFavoriteMovies = async () => {
-  //     const userId = getIdUserByServer();
+// useEffect(() => {
+//   const fetchFavoriteMovies = async () => {
+//     // ✅ Phải chờ Promise trả kết quả thật
+//     const userId = await getIdUser();
 
-  //     if (!userId) {
-  //       console.error("User chưa đăng nhập hoặc token không hợp lệ");
-  //       setLoading(false);
-  //       return;
-  //     }
+//     if (!userId) {
+//       console.error("⚠️ User chưa đăng nhập hoặc token không hợp lệ");
+//       setLoading(false);
+//       return;
+//     }
 
-  //     try {
-  //       const response = await fetch(
-  //         `${endpointBe}/favorites/get-favorite-movie/${userId}`
-  //       );
-
-  //       const idMovieList = await response.json();
-
-  //       if (!Array.isArray(idMovieList)) {
-  //         console.error("Server response is not an array", idMovieList);
-  //         setMovieList([]);
-  //         setLoading(false);
-  //         return;
-  //       }
-
-  //       const fetchMoviePromises = idMovieList.map(async (idMovie: number) => {
-  //         try {
-  //           const movie = await layPhimById(idMovie);
-  //           return movie;
-  //         } catch (err) {
-  //           console.error(`Failed to fetch movie ${idMovie}`, err);
-  //           return null;
-  //         }
-  //       });
-
-  //       const movies = (await Promise.all(fetchMoviePromises)).filter(Boolean);
-  //       setMovieList(movies);
-  //     } catch (error) {
-  //       console.error("Failed to fetch favorite movies", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchFavoriteMovies();
-  // }, []);
 useEffect(() => {
   const fetchFavoriteMovies = async () => {
-    // ✅ Phải chờ Promise trả kết quả thật
-    const userId = await getIdUserByServer();
-
-    if (!userId) {
-      console.error("⚠️ User chưa đăng nhập hoặc token không hợp lệ");
+    if (!isLoggedIn || !userInfo?.id) {
+      console.error("⚠️ User chưa đăng nhập");
       setLoading(false);
       return;
     }
 
+    const userId = userInfo.id;
     try {
       const response = await fetch(
         `${endpointBe}/favorites/get-favorite-movie/${userId}`,

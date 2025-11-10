@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import { endpointBe } from "../../utils/contant";
 import ReviewPage from "./components/Review/ReviewPage";
 import useScrollToTop from "../../hooks/ScrollToTop";
-import { getIdUserByServer, isAuthenticated } from "../../utils/JwtService";
+import { useAuth } from "../../utils/AuthContext";
 
 const MovieDetail: React.FC = () => {
     useScrollToTop();
@@ -21,7 +21,7 @@ const MovieDetail: React.FC = () => {
     const [movie, setMovie] = useState<Movie | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
+    const { userInfo, isLoggedIn } = useAuth();
     useEffect(() => {
         const fetchMovie = async () => {
             try {
@@ -42,40 +42,112 @@ const MovieDetail: React.FC = () => {
     }, [movieId]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
+// useEffect(() => {
+//   const checkFavoriteStatus = async () => {
+//     if (!movie) return;
+
+//     try {
+//       const userId = await getIdUserByServer(); // ✅ thêm await ở đây
+//       if (!userId) return;
+
+//       const res = await fetch(`${endpointBe}/favorites/get-favorite-movie/${userId}`, {
+//         credentials: "include",
+//       });
+
+//       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+//       const favoriteIds: number[] = await res.json();
+
+//       console.log("⭐ Favorite movie IDs:", favoriteIds);
+
+//       if (Array.isArray(favoriteIds) && favoriteIds.includes(Number(movie.id))) {
+//         setIsFavoriteMovie(true);
+//       } else {
+//         setIsFavoriteMovie(false);
+//       }
+//     } catch (err) {
+//       console.error("❌ Lỗi khi kiểm tra phim yêu thích:", err);
+//     }
+//   };
+
+//   checkFavoriteStatus();
+// }, [movie]);
 useEffect(() => {
   const checkFavoriteStatus = async () => {
-    if (!movie) return;
+    if (!movie || !isLoggedIn || !userInfo?.id) return;
 
     try {
-      const userId = await getIdUserByServer(); // ✅ thêm await ở đây
-      if (!userId) return;
-
-      const res = await fetch(`${endpointBe}/favorites/get-favorite-movie/${userId}`, {
+      const res = await fetch(`${endpointBe}/favorites/get-favorite-movie/${userInfo.id}`, {
         credentials: "include",
       });
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const favoriteIds: number[] = await res.json();
 
-      console.log("⭐ Favorite movie IDs:", favoriteIds);
-
-      if (Array.isArray(favoriteIds) && favoriteIds.includes(Number(movie.id))) {
-        setIsFavoriteMovie(true);
-      } else {
-        setIsFavoriteMovie(false);
-      }
+      setIsFavoriteMovie(favoriteIds.includes(Number(movie.id)));
     } catch (err) {
       console.error("❌ Lỗi khi kiểm tra phim yêu thích:", err);
     }
   };
 
   checkFavoriteStatus();
-}, [movie]);
+}, [movie, isLoggedIn, userInfo]);
+// const handleFavoriteMovie = async () => {
+//   // Kiểm tra đăng nhập
+//   const loggedIn = await isAuthenticated();
+//   if (!loggedIn) {
+//     toast.info("Bạn cần đăng nhập để thực hiện chức năng này");
+//     navigate("/dangnhap");
+//     return;
+//   }
 
+//   if (!movie?.id) {
+//     toast.error("Không tìm thấy thông tin phim");
+//     return;
+//   }
+
+//   setLoading(true);
+
+//   try {
+//     const userId = await getIdUserByServer();
+//     if (!userId) throw new Error("Không lấy được ID người dùng");
+
+//     const url = isFavoriteMovie
+//       ? `${endpointBe}/favorites/remove/${movie.id}`
+//       : `${endpointBe}/favorites/add`;
+
+//     const response = await fetch(url, {
+//       method: isFavoriteMovie ? "DELETE" : "POST",
+//       credentials: "include", // gửi cookie HttpOnly
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: isFavoriteMovie
+//         ? undefined
+//         : JSON.stringify({ userId, movieId: movie.id }), // ✅ gửi đầy đủ thông tin
+//     });
+
+//     const result = await response.json().catch(() => null);
+
+//     if (!response.ok) {
+//       console.error("Server error:", result);
+//       throw new Error(result?.message || `Thao tác thất bại (HTTP ${response.status})`);
+//     }
+
+//     setIsFavoriteMovie(!isFavoriteMovie);
+//     toast.success(
+//       isFavoriteMovie
+//         ? "Đã xóa khỏi danh sách yêu thích"
+//         : "Đã thêm vào danh sách yêu thích"
+//     );
+//   } catch (err: any) {
+//     console.error("❌ Không thể cập nhật danh sách yêu thích:", err);
+//     toast.error(err.message || "Không thể cập nhật danh sách yêu thích");
+//   } finally {
+//     setLoading(false);
+//   }
+// };
 const handleFavoriteMovie = async () => {
-  // Kiểm tra đăng nhập
-  const loggedIn = await isAuthenticated();
-  if (!loggedIn) {
+  if (!isLoggedIn || !userInfo?.id) {
     toast.info("Bạn cần đăng nhập để thực hiện chức năng này");
     navigate("/dangnhap");
     return;
@@ -89,37 +161,22 @@ const handleFavoriteMovie = async () => {
   setLoading(true);
 
   try {
-    const userId = await getIdUserByServer();
-    if (!userId) throw new Error("Không lấy được ID người dùng");
-
     const url = isFavoriteMovie
       ? `${endpointBe}/favorites/remove/${movie.id}`
       : `${endpointBe}/favorites/add`;
 
     const response = await fetch(url, {
       method: isFavoriteMovie ? "DELETE" : "POST",
-      credentials: "include", // gửi cookie HttpOnly
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: isFavoriteMovie
-        ? undefined
-        : JSON.stringify({ userId, movieId: movie.id }), // ✅ gửi đầy đủ thông tin
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: isFavoriteMovie ? undefined : JSON.stringify({ userId: userInfo.id, movieId: movie.id }),
     });
 
     const result = await response.json().catch(() => null);
-
-    if (!response.ok) {
-      console.error("Server error:", result);
-      throw new Error(result?.message || `Thao tác thất bại (HTTP ${response.status})`);
-    }
+    if (!response.ok) throw new Error(result?.message || `HTTP ${response.status}`);
 
     setIsFavoriteMovie(!isFavoriteMovie);
-    toast.success(
-      isFavoriteMovie
-        ? "Đã xóa khỏi danh sách yêu thích"
-        : "Đã thêm vào danh sách yêu thích"
-    );
+    toast.success(isFavoriteMovie ? "Đã xóa khỏi danh sách yêu thích" : "Đã thêm vào danh sách yêu thích");
   } catch (err: any) {
     console.error("❌ Không thể cập nhật danh sách yêu thích:", err);
     toast.error(err.message || "Không thể cập nhật danh sách yêu thích");
@@ -127,7 +184,6 @@ const handleFavoriteMovie = async () => {
     setLoading(false);
   }
 };
-
 // const handleFavoriteMovie = async () => {
 //   // Kiểm tra đăng nhập trước khi thực hiện
 //   const loggedIn = await isAuthenticated();

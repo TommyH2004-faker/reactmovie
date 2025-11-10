@@ -400,7 +400,7 @@ import { useAuth } from "../utils/AuthContext";
 import { User } from "../types/user";
 import { endpointBe } from "../utils/contant";
 import HiddenInputUpload from "../utils/HiddenInputUpload";
-import { getIdUserByServer } from "../utils/JwtService";
+
 import { deleteReview, updateReview } from "../api/ReviewApi";
 
 const ProfilePage: React.FC = () => {
@@ -412,9 +412,8 @@ const ProfilePage: React.FC = () => {
     if (!isLoggedIn) navigate("/dangnhap");
   }, [isLoggedIn, navigate]);
 
-  const [user, setUser] = useState<User | null>(null);
   const [tabValue, setTabValue] = useState(0);
-  const [previewAvatar, setPreviewAvatar] = useState("");
+
   const [isUploadAvatar, setIsUploadAvatar] = useState(false);
   const [modified, setModified] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
@@ -422,38 +421,53 @@ const ProfilePage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const { setUserInfo } = useAuth();
- useEffect(() => {
-  const fetchUser = async () => {
-    try {
-      const idUser = await getIdUserByServer(); // cần await
-      if (!idUser) return;
+  const { userInfo, setUserInfo } = useAuth();
+  const [user, setUser] = useState<User | null>(null);
+  const [previewAvatar, setPreviewAvatar] = useState("");
+  const [dataAvatar, setDataAvatar] = useState("");
 
-      const res = await fetch(`${endpointBe}/users/${idUser}`, {
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error("Lỗi tải dữ liệu người dùng");
+//  useEffect(() => {
+//   const fetchUser = async () => {
+//     try {
+//       const idUser = await getIdUserByServer(); // cần await
+//       if (!idUser) return;
 
-      const data = await res.json();
-      setUser(data);
-      setPreviewAvatar(data.avatar|| "");
-    } catch (err) {
-      toast.error("Không tải được dữ liệu người dùng");
-      console.error(err);
-    }
+//       const res = await fetch(`${endpointBe}/users/${idUser}`, {
+//         credentials: "include",
+//       });
+//       if (!res.ok) throw new Error("Lỗi tải dữ liệu người dùng");
+
+//       const data = await res.json();
+//       setUser(data);
+//       setPreviewAvatar(data.avatar|| "");
+//     } catch (err) {
+//       toast.error("Không tải được dữ liệu người dùng");
+//       console.error(err);
+//     }
+//   };
+
+//   fetchUser();
+// }, []);
+
+useEffect(() => {
+  if (!userInfo) return;
+
+  const mappedUser: User = {
+    id: userInfo.id || 0,
+    name: userInfo.username,   // map username sang name
+    email: userInfo.email || "",
+    role: userInfo.role,
+    avatar: userInfo.avatar || "",
+    gender: "male",            // mặc định nếu không có trong userInfo
+    enabled: true,             // mặc định
+    reviews: [],               // nếu cần
   };
 
-  fetchUser();
-}, []);
+  setUser(mappedUser);
+  setPreviewAvatar(mappedUser.avatar || "");
+}, [userInfo]);
 
-const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
-  setSelectedFile(file);
 
-  setPreviewAvatar(URL.createObjectURL(file));
-  setIsUploadAvatar(true);
-};
 
   const handleSubmitInfo = (event: FormEvent) => {
     event.preventDefault();
@@ -559,7 +573,17 @@ const handleSubmitAvatar = async () => {
 
 
 
-
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      setDataAvatar(e.target.result as string);
+      setPreviewAvatar(URL.createObjectURL(file));
+      setIsUploadAvatar(true);
+    };
+    reader.readAsDataURL(file);
+  };
 const handleChangePassword = async (e: FormEvent) => {
   e.preventDefault();
   if (!user) return;
