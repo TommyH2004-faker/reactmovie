@@ -357,6 +357,7 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
 
       if (res.ok) {
         const data = await res.json();
+         console.log("🔥 Profile from server:", data); // <--- thêm đây
         setLoggedIn(true);
         setUserInfo({
           id: data.id,

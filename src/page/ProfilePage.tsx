@@ -448,6 +448,9 @@ const ProfilePage: React.FC = () => {
 
 //   fetchUser();
 // }, []);
+useEffect(() => {
+  console.log("🟢 userInfo hiện tại từ AuthContext:", userInfo);
+}, [userInfo]);
 
 useEffect(() => {
   if (!userInfo) return;
