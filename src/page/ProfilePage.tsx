@@ -615,6 +615,7 @@ const handleSubmitAvatar = async () => {
       setDataAvatar(e.target.result as string);
       setPreviewAvatar(URL.createObjectURL(file));
       setIsUploadAvatar(true);
+       setSelectedFile(file); 
     };
     reader.readAsDataURL(file);
   };
