@@ -274,25 +274,22 @@ const handleSubmit = async (e: React.FormEvent) => {
     case 401:
       if (errorMessage.includes("not enabled")) {
         toast.error("Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để kích hoạt.");
-        setError("Tài khoản chưa được kích hoạt");
+        setError("");
       } else if (errorMessage.includes("locked")) {
         toast.error("Tài khoản đã bị khóa. Vui lòng liên hệ admin.");
         setError("Tài khoản đã bị khóa");
       } else if (errorMessage.includes("password")) {
         toast.error("Mật khẩu không chính xác");
-        setError("Mật khẩu không chính xác");
+        setError("");
       } else {
         toast.error(errorMessage || "Thông tin đăng nhập không chính xác");
-        setError("Thông tin đăng nhập không chính xác");
       }
       return;
     case 404:
       toast.error("Tài khoản không tồn tại");
-      setError("Tài khoản không tồn tại");
       return;
     default:
       toast.error(errorMessage || "Đăng nhập thất bại");
-      setError("Đăng nhập thất bại");
       return;
   }
 }
@@ -326,7 +323,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   } catch (err) {
     console.error("❌ Lỗi đăng nhập:", err);
     toast.error("Có lỗi xảy ra khi đăng nhập, vui lòng thử lại!");
-    setError("Tài khoản hoặc mật khẩu không đúng");
+    setError("");
   }
 };
 
