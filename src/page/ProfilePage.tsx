@@ -452,22 +452,53 @@ useEffect(() => {
   console.log("🟢 userInfo hiện tại từ AuthContext:", userInfo);
 }, [userInfo]);
 
-useEffect(() => {
-  if (!userInfo) return;
+// useEffect(() => {
+//   if (!userInfo) return;
 
-  const mappedUser: User = {
-    id: userInfo.id || 0,
-    name: userInfo.username || "",
-    email: userInfo.email || "",
-    role: userInfo.role,
-    avatar: userInfo.avatar || "",
-    gender: "male",            // mặc định nếu không có trong userInfo
-    enabled: true,             // mặc định
-    reviews: [],               // nếu cần
+//   const mappedUser: User = {
+//     id: userInfo.id || 0,
+//     name: userInfo.username,   // map username sang name
+//     email: userInfo.email || "",
+//     role: userInfo.role,
+//     avatar: userInfo.avatar || "",
+//     gender: "male",            // mặc định nếu không có trong userInfo
+//     enabled: true,             // mặc định
+//     reviews: userInfo.reviews || [],              // nếu cần
+//   };
+
+//   setUser(mappedUser);
+//   setPreviewAvatar(mappedUser.avatar || "");
+// }, [userInfo]);
+useEffect(() => {
+  const fetchUserFromBackend = async () => {
+    if (!userInfo) return; // cần userInfo để lấy id (hoặc getIdUserByServer)
+    try {
+      const res = await fetch(`${endpointBe}/users/${userInfo.id}`, {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Lỗi tải dữ liệu người dùng");
+      const data = await res.json();
+
+      const mappedUser: User = {
+        id: data.id || 0,
+        name: data.username || data.name,
+        email: data.email || "",
+        role: data.role,
+        avatar: data.avatar || "",
+        gender: "male",
+        enabled: true,
+        reviews: data.reviews || [], // ✅ reviews từ entity User
+      };
+
+      setUser(mappedUser);
+      setPreviewAvatar(mappedUser.avatar || "");
+    } catch (err) {
+      console.error(err);
+      toast.error("Không tải được dữ liệu người dùng");
+    }
   };
 
-  setUser(mappedUser);
-  setPreviewAvatar(mappedUser.avatar || "");
+  fetchUserFromBackend();
 }, [userInfo]);
 
 
