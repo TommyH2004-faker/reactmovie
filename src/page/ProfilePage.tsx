@@ -421,7 +421,7 @@ const ProfilePage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const { userInfo, setUserInfo } = useAuth();
+  const { userInfo, refreshProfile } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [previewAvatar, setPreviewAvatar] = useState("");
   const [, setDataAvatar] = useState("");
@@ -584,11 +584,10 @@ const handleSubmitAvatar = async () => {
         setUser((prev) => prev ? { ...prev, avatar: newAvatarUrl } : prev);
         setPreviewAvatar(newAvatarUrl);
 
-        // Cập nhật AuthContext
-        setUserInfo((prev) => prev ? { 
-          ...prev,
-          avatar: newAvatarUrl 
-        } : prev);
+        // Refresh AuthContext từ server để đảm bảo đồng bộ
+        console.log('🔄 Refreshing profile after avatar upload...');
+        await refreshProfile();
+        console.log('✅ Profile refreshed successfully');
 
         console.log('Đã cập nhật avatar URL:', newAvatarUrl);
         toast.success("Cập nhật ảnh đại diện thành công!");
