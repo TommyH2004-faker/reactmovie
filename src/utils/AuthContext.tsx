@@ -446,7 +446,7 @@ interface AuthContextProps {
 /** 🧠 Kiểu thông tin người dùng */
 interface UserInfo {
   id: number;
-  username: string;
+  name: string;
   email?: string;
   role: string;
   avatar?: string;
@@ -514,7 +514,7 @@ export const AuthProvider: React.FC<AuthContextProps> = ({ children }) => {
       setLoggedIn(true);
       setUserInfo({
         id: data.id,
-        username: data.name, // map đúng field backend
+        name: data.name || data.username, // map đúng field backend
         email: data.email,
         role:
           Array.isArray(data.roles) && data.roles.length > 0
