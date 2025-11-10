@@ -577,7 +577,7 @@ const handleSubmitAvatar = async () => {
         const data = await res.json();
 
         // Lấy URL avatar từ response
-        const newAvatarUrl = data.avatar_url || data.avatar;
+        const newAvatarUrl = data.avatar; // backend trả về key 'avatar'
         if (!newAvatarUrl) throw new Error("Không nhận được URL avatar");
 
         // Cập nhật state local
