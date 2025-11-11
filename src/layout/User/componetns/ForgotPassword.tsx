@@ -33,10 +33,12 @@ export const ForgotPassword: React.FC = () => {
 
     toast.promise(
       fetch(endpointBe + "/auth/forgot-password", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      })
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+    credentials: "include",
+  })
+
         .then((response) => {
           if (response.ok) {
             toast.success("Gửi thành công, hãy kiểm tra email để lấy mật khẩu");
@@ -53,40 +55,6 @@ export const ForgotPassword: React.FC = () => {
       { pending: "Đang trong quá trình xử lý ..." }
     );
   }
-// const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-//   e.preventDefault();
-//   if (!validateEmail(email)) {
-//     setErrorEmail("Email không hợp lệ");
-//     return;
-//   }
-
-//   setErrorEmail("");
-
-//   try {
-//     const promise = fetch(endpointBe + "/auth/forgot-password", {
-//       method: "PUT",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ email }),
-//     });
-
-//     const response = await toast.promise(promise, {
-//       pending: "Đang gửi yêu cầu...",
-//       success: "Đã gửi thành công! Hãy kiểm tra email.",
-//       error: "Gửi thất bại, vui lòng thử lại.",
-//     });
-
-//     if (!response.ok) {
-//       const err = await response.json();
-//       toast.warning(err.message || "Email không tồn tại!");
-//       return;
-//     }
-
-//     navigation("/dangnhap");
-//   } catch (error) {
-//     console.error("Lỗi:", error);
-//     toast.error("Lỗi kết nối server");
-//   }
-// };
 
   return (
     <Box
