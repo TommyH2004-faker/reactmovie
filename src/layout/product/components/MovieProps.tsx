@@ -163,16 +163,12 @@ const MovieProps: React.FC<MoviePropsInterface> = ({ movie }) => {
 
 export default MovieProps;
 */
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import React from "react";
+import { Link } from "react-router-dom";
 import { Movie } from "../../../types/movie";
-
-import { endpointBe } from "../../../utils/contant";
 import renderRating from "../../../utils/SaoXepHang";
-
 import useScrollToTop from "../../../hooks/ScrollToTop";
-import { useAuth } from "../../../utils/AuthContext";
+import { useFavorites } from "../../../hooks/useFavorites";
 
 interface MoviePropsInterface {
   movie: Movie;
@@ -180,129 +176,13 @@ interface MoviePropsInterface {
 
 const MovieProps: React.FC<MoviePropsInterface> = ({ movie }) => {
   useScrollToTop();
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { userInfo, isLoggedIn } = useAuth();
+  const { isFavorite, toggleFavorite, loading } = useFavorites();
+  
+  const isMovieFavorite = isFavorite(movie.id);
 
-// useEffect(() => {
-//   const fetchFavorites = async () => {
-//     // ✅ Chờ Promise trả kết quả thật
-//     const userId = await getIdUserByServer();
-//     const loggedIn = await isAuthenticated();
-
-
-
-//     if (!userId || !loggedIn) return; // chưa login hoặc không có id → dừng
-
-//     try {
-//       const res = await fetch(`${endpointBe}/favorites/get-favorite-movie/${userId}`);
-//       const favoriteIds: number[] = await res.json();
-
-//       if (favoriteIds.includes(Number(movie.id))) {
-//         setIsFavorite(true);
-//       }
-//     } catch (err) {
-//       console.error('❌ Lỗi khi lấy danh sách phim yêu thích:', err);
-//     }
-//   };
-
-//   fetchFavorites();
-// }, [movie.id]);
-useEffect(() => {
-  const fetchFavorites = async () => {
-    if (!isLoggedIn || !userInfo?.id) return;
-
-    try {
-      const res = await fetch(`${endpointBe}/favorites/get-favorite-movie/${userInfo.id}`, {
-        credentials: "include",
-      });
-      const favoriteIds: number[] = await res.json();
-
-      setIsFavorite(favoriteIds.includes(Number(movie.id)));
-    } catch (err) {
-      console.error('❌ Lỗi khi lấy danh sách phim yêu thích:', err);
-    }
+  const handleFavoriteToggle = async () => {
+    await toggleFavorite(movie.id);
   };
-
-  fetchFavorites();
-}, [movie.id, isLoggedIn, userInfo]);
- 
-/** Thêm / Xóa khỏi danh sách yêu thích */
-// const handleFavoriteToggle = async () => {
-//   // ⚠️ Kiểm tra đăng nhập (dùng hàm async!)
-//   const loggedIn = await isAuthenticated();
-//   if (!loggedIn) {
-//     toast.info("Bạn phải đăng nhập để sử dụng chức năng này");
-//     return navigate("/dangnhap");
-//   }
-
-//   setLoading(true);
-//   try {
-//     const url = isFavorite
-//       ? `${endpointBe}/favorites/remove/${movie.id}`
-//       : `${endpointBe}/favorites/add`;
-
-//     const response = await fetch(url, {
-//       method: isFavorite ? "DELETE" : "POST",
-//       credentials: "include",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: isFavorite ? undefined : JSON.stringify({ movieId: movie.id }),
-//     });
-
-//     const result = await response.json();
-//     if (!response.ok) throw new Error(result?.message || "Thao tác thất bại");
-
-//     setIsFavorite(!isFavorite);
-//     toast.success(
-//       isFavorite
-//         ? "Đã xóa khỏi danh sách yêu thích"
-//         : "Đã thêm vào danh sách yêu thích"
-//     );
-//   } catch (err) {
-//     console.error("❌ Không thể cập nhật danh sách yêu thích:", err);
-//     toast.error("Không thể cập nhật danh sách yêu thích");
-//   } finally {
-//     setLoading(false);
-//   }
-// };
-const handleFavoriteToggle = async () => {
-  if (!isLoggedIn || !userInfo?.id) {
-    toast.info("Bạn phải đăng nhập để sử dụng chức năng này");
-    return navigate("/dangnhap");
-  }
-
-  setLoading(true);
-  try {
-    const url = isFavorite
-      ? `${endpointBe}/favorites/remove/${movie.id}`
-      : `${endpointBe}/favorites/add`;
-
-    const response = await fetch(url, {
-      method: isFavorite ? "DELETE" : "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: isFavorite ? undefined : JSON.stringify({ movieId: movie.id, userId: userInfo.id }),
-    });
-
-    const result = await response.json();
-    if (!response.ok) throw new Error(result?.message || "Thao tác thất bại");
-
-    setIsFavorite(!isFavorite);
-    toast.success(
-      isFavorite
-        ? "Đã xóa khỏi danh sách yêu thích"
-        : "Đã thêm vào danh sách yêu thích"
-    );
-  } catch (err) {
-    console.error("❌ Không thể cập nhật danh sách yêu thích:", err);
-    toast.error("Không thể cập nhật danh sách yêu thích");
-  } finally {
-    setLoading(false);
-  }
-};
 
 
   /** 🎨 JSX giao diện phim */
@@ -357,10 +237,10 @@ const handleFavoriteToggle = async () => {
               <button
                   onClick={handleFavoriteToggle}
                   disabled={loading}
-                  className={`btn btn-sm rounded-circle ${isFavorite ? "btn-danger" : "btn-outline-secondary"}`}
+                  className={`btn btn-sm rounded-circle ${isMovieFavorite ? "btn-danger" : "btn-outline-secondary"}`}
                   style={{ width: "38px", height: "38px" }}
               >
-                <i className={`fas fa-heart ${isFavorite ? "" : "text-muted"}`}></i>
+                <i className={`fas fa-heart ${isMovieFavorite ? "" : "text-muted"}`}></i>
               </button>
             </div>
           </div>
