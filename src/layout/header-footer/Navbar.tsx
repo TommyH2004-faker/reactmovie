@@ -233,10 +233,20 @@ export default function Navbar({ tuKhoaTimKiem, setTuKhoaTimKiem }: NavbarProps)
 
             <Divider />
 
-           <MenuItem
+           {/* <MenuItem
               onClick={() => logout()}
               sx={{ color: "error.main" }}
             >
+            <ListItemIcon><LogoutIcon fontSize="small" color="error" /></ListItemIcon>
+            <ListItemText>Đăng xuất</ListItemText>
+          </MenuItem> */}
+          <MenuItem
+            onClick={() => {
+              logout();
+              navigate("/dangnhap"); // redirect về trang đăng nhập
+            }}
+            sx={{ color: "error.main" }}
+          >
             <ListItemIcon><LogoutIcon fontSize="small" color="error" /></ListItemIcon>
             <ListItemText>Đăng xuất</ListItemText>
           </MenuItem>
