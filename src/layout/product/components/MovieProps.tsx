@@ -168,7 +168,9 @@ import { Link } from "react-router-dom";
 import { Movie } from "../../../types/movie";
 import renderRating from "../../../utils/SaoXepHang";
 import useScrollToTop from "../../../hooks/ScrollToTop";
-import { useFavorites } from "../../../hooks/useFavorites";
+import { useFavoritesContext } from "../../../utils/FavoritesContext";
+
+
 
 interface MoviePropsInterface {
   movie: Movie;
@@ -176,7 +178,8 @@ interface MoviePropsInterface {
 
 const MovieProps: React.FC<MoviePropsInterface> = ({ movie }) => {
   useScrollToTop();
-  const { isFavorite, toggleFavorite, loading } = useFavorites();
+  const { isFavorite, toggleFavorite, loading } = useFavoritesContext();
+
   
   const isMovieFavorite = isFavorite(movie.id);
 

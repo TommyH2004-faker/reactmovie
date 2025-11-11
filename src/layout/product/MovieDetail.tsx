@@ -8,7 +8,7 @@ import DinhDangSo from "../../utils/dinhDangSo";
 import "./MovieDetail.css";
 import ReviewPage from "./components/Review/ReviewPage";
 import useScrollToTop from "../../hooks/ScrollToTop";
-import { useFavorites } from "../../hooks/useFavorites";
+import { useFavoritesContext } from "../../utils/FavoritesContext";
 
 const MovieDetail: React.FC = () => {
     useScrollToTop();
@@ -16,8 +16,9 @@ const MovieDetail: React.FC = () => {
     const [movie, setMovie] = useState<Movie | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    
-    const { isFavorite, toggleFavorite, loading: favoriteLoading } = useFavorites();
+    const { isFavorite, toggleFavorite, loading: favoriteLoading } = useFavoritesContext();
+
+
     const isMovieFavorite = movie ? isFavorite(movie.id) : false;
     useEffect(() => {
         const fetchMovie = async () => {

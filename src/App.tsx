@@ -147,6 +147,7 @@ import UserManagementPage from './layout/admin/UserManagement';
 import GenreManagementPage from './layout/admin/GenreManagement';
 import { Error404Page } from './page/Error/404Page';
 import ProfilePage from './page/ProfilePage';
+import { FavoritesProvider } from './utils/FavoritesContext';
 
 const AdminLayout = () => {
   const { isLoggedIn, userInfo, isLoading } = useAuth();
@@ -246,11 +247,13 @@ const MyRoutes = () => {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <MyRoutes />
-      </AuthProvider>
-    </BrowserRouter>
+     <FavoritesProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <MyRoutes />
+        </AuthProvider>
+      </BrowserRouter>
+    </FavoritesProvider>
   );
 }
 
