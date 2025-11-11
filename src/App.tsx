@@ -247,14 +247,15 @@ const MyRoutes = () => {
 
 function App() {
   return (
-     <FavoritesProvider>
-      <BrowserRouter>
-        <AuthProvider>
+    <AuthProvider>
+      <FavoritesProvider>
+        <BrowserRouter>
           <MyRoutes />
-        </AuthProvider>
-      </BrowserRouter>
-    </FavoritesProvider>
+        </BrowserRouter>
+      </FavoritesProvider>
+    </AuthProvider>
   );
 }
+
 
 export default App;
