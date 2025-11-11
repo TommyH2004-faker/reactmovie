@@ -101,7 +101,7 @@ export const useFavorites = (): UseFavoritesReturn => {
     } finally {
       setLoading(false);
     }
-  }, [isLoggedIn, userInfo?.id, favoriteMovies]);
+  }, [isLoggedIn, userInfo?.id, favoriteMovies, navigate]);
 
   return {
     favoriteMovies,
