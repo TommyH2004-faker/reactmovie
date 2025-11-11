@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import {Link, useNavigate, useParams } from "react-router-dom";
+import {Link, useParams } from "react-router-dom";
 import { layPhimById } from "../../api/movieApi";
 import { Movie } from "../../types/movie";
 import SaoXepHang from "../../utils/SaoXepHang";
