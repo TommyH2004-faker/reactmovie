@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../utils/AuthContext';
 import { endpointBe } from '../utils/contant';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router';
+
 
 interface UseFavoritesReturn {
   favoriteMovies: Set<number>;
@@ -15,7 +17,8 @@ export const useFavorites = (): UseFavoritesReturn => {
   const { userInfo, isLoggedIn } = useAuth();
   const [favoriteMovies, setFavoriteMovies] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
+  
   // Fetch danh sách phim yêu thích từ server
   const refreshFavorites = useCallback(async () => {
     if (!isLoggedIn || !userInfo?.id) {
@@ -52,6 +55,7 @@ export const useFavorites = (): UseFavoritesReturn => {
   const toggleFavorite = useCallback(async (movieId: number): Promise<void> => {
     if (!isLoggedIn || !userInfo?.id) {
       toast.info("Bạn phải đăng nhập để sử dụng chức năng này");
+      navigate("/dangnhap");
       return;
     }
 
